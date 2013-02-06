@@ -16,7 +16,7 @@ MIME_TYPES = {
 function serveFile(filePath, response) {
 	fs.exists(filePath, function(exists) {
 	if (!exists) {
-	console.log(filePath + " not found");
+		console.log(filePath + " not found");
 		response.writeHead(404);
 		response.end('404!');
 		return;
@@ -39,24 +39,42 @@ function serveFile(filePath, response) {
 	});
 }
 
-function serveTopic(req, resp, urlParts){
-		hello(resp);
+function serveREST(response, method, urlParts){
+	//console.log('accepted REST call '+urlParts.pathname);
+	//topic(GET for a list of topic,POST to post a new topic+link)
+	//topic/nyannyannyan/comment(GET to grab all the comments to a topic,POST to reply to a topic or subcomment)
+	//topic/nyannyannyan/comment/456(POST or PUT to upvote)
+	restRequest = /\/topic(\/(\w+)(\/comment(\/(\w+))?)?)?\/?$/.exec(urlParts.pathname);
+	if (restRequest) {
+		var topicID = restRequest[2],
+			commentID = restRequest[5];
+		
+		response.writeHead(200, {'Content-Type':'text/plain'});
+		response.write(topicID+" "+commentID + "\n");
+		
+		response.end(JSON.stringify(restRequest));
+	} else {
+		response.writeHead(404);
+		response.end('bad REST request');
+		console.log("bad REST request" + urlParts.pathname);
+	}
+	
+		
 }
 
 // Just an Aussie greeting
-function hello(resp) {
-	resp.writeHead(200, {'Content-Type':'text/plain'});
-	resp.end("G'day");
+function hello(response) {
+	response.writeHead(200, {'Content-Type':'text/plain'});
+	response.end("G'day");
 }
 
 http.createServer(function(request, response) {
-	//console.log(request.url);
-	var urlParts = url.parse(request.url),
+	console.log('<==['+request.method+'] '+request.url);
+	var urlParts = url.parse(request.url, true),
 		pathname = urlParts.pathname;
-		console.log(pathname);
 	//All REST calls 
-	if (pathname.match(/^\/(topic|comment)/)) {
-		serveTopic(request, response, urlParts);
+	if (pathname.match(/\/topic/)) {
+		serveREST(response, request.method, urlParts);
 	} else {
 		pathname = (pathname=='/') ? '/index.html' : pathname;
 		serveFile('.'+pathname, response);
