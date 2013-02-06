@@ -54,7 +54,8 @@ http.createServer(function(request, response) {
 	var urlParts = url.parse(request.url),
 		pathname = urlParts.pathname;
 		console.log(pathname);
-	if (pathname.match(/\/(topic|comment)$/)) {
+	//All REST calls 
+	if (pathname.match(/^\/(topic|comment)/)) {
 		serveTopic(request, response, urlParts);
 	} else {
 		pathname = (pathname=='/') ? '/index.html' : pathname;
