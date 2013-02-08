@@ -41,31 +41,39 @@ function serveFile(filePath, response) {
 
 function serveREST(response, method, urlParts){
 	//console.log('accepted REST call '+urlParts.pathname);
-	//topic(GET for a list of topic,POST to post a new topic+link)
-	//topic/nyannyannyan/comment(GET to grab all the comments to a topic,POST to reply to a topic or subcomment)
-	//topic/nyannyannyan/comment/456(POST or PUT to upvote)
-	restRequest = /\/topic(\/(\w+)(\/comment(\/(\w+))?)?)?\/?$/.exec(urlParts.pathname);
-	if (restRequest) {
-		var topicID = restRequest[2],
-			commentID = restRequest[5];
+	
+	/*  3 types of REST calls
+	/topic(GET for a list of topic,POST to post a new topic+link)
+	/topic/nyannyannyan/comment(GET to grab all the comments to a topic,POST to reply to a topic or subcomment)
+	/topic/nyannyannyan/comment/456(POST or PUT to upvote)
+	*/
+	
+	var result;
+	if        (result=new RegExp("^/topic/?$").exec(urlParts.pathname)){
+		respondJSON(response, "topic");
 		
-		response.writeHead(200, {'Content-Type':'text/plain'});
-		response.write(topicID+" "+commentID + "\n");
+	} else if (result=new RegExp("^/topic/(\\w+)/comment/?$").exec(urlParts.pathname)){
+		var topicID = result[1];
+		respondJSON(response, {topicID:topicID});
 		
-		response.end(JSON.stringify(restRequest));
+	} else if (result=new RegExp("^/topic/(\\w+)/comment/(\\w+)/?$").exec(urlParts.pathname)){
+		var topicID = result[1],
+			commentID = result[2];
+		respondJSON(response, {topicID:topicID, commentID:commentID});
+		
 	} else {
 		response.writeHead(404);
 		response.end('bad REST request');
 		console.log("bad REST request" + urlParts.pathname);
 	}
-	
-		
 }
 
-// Just an Aussie greeting
-function hello(response) {
-	response.writeHead(200, {'Content-Type':'text/plain'});
-	response.end("G'day");
+//Just sends out a JSON.stringified object and also log to console for debugging
+function respondJSON(response, obj){
+	var stringy = JSON.stringify(obj);
+	response.writeHead(200, {'Content-type': 'application/json'});
+	response.end(stringy);
+	console.log(stringy);
 }
 
 http.createServer(function(request, response) {
