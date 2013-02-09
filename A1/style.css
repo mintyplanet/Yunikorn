@@ -1,0 +1,26 @@
+/*
+ * A1 CSS
+ *
+ * Designed by Naomi Cui to be used with Twitter Bootstrap
+ *
+ */
+ 
+.topic {
+	width: 550px;
+}
+
+.topic_head {}
+
+.topic_meta {}
+
+.topic_url {
+	display: inline-block;
+}
+
+.reply {}
+
+.reply_body {}
+
+.comment {}
+
+.comment_meta {}
