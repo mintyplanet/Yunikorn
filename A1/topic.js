@@ -1,41 +1,41 @@
 /*Defining a Topic model
- * to create a Topic variable: Object.create(topic, {Title: {value : "string"}, {Hyperlink:{"link"}}});
- * to set or change the variales: var topic = Object.create(topic);
- *												topic.Title = "sting";
- * to call the functions: var title = topic.getTitle()
  */
-var topic = {
+function Topic(title, link) {
+  this.title = title;
+  this.link = link;
+  this.comment = new Array();
+  this.upvote = 0;
+}
+
+Topic.prototype = {
+	
 	//return the title of the topic
 	getTitle: function (){
-		return this.Title;
-	}
+		return this.title;
+	},
 
 	// return the link 
-	getHyperlink: function(){
-		return this.Hyperlink;
-	}
-
-	//return the generated ID
-	getID: function(){
-		return this.ID;
-	}
+	getLink: function(){
+		return this.link;
+	},
 
 	//return a list of comments
 	getComments: function(){
 		return this.commentArray;
-	}
+	},
 
 	// return the number of upvote the comments of this topic received.
 	getUpvote: function(){
-		var upvoteCount = 0;
-		var comment;
-		for (var i = 0; i < this.commentsArray.length; i++){
-			comment = this.commentsArray[i];
-			upvoteCount += comment.getupvote;
-			upvoteCount += comment.getsubupvote; 
-		}
-		return upvoteCount;
+		return this.upvote;
+	},
+
+	addComment: function(commentID){
+		this.comment.push(commentID);
+	},
+
+	voteup: function(){
+		this.upvote++;
 	}
 }
 
-module.exports = topic;
+module.exports = Topic;
