@@ -1,0 +1,42 @@
+/*
+ * A1 CSS
+ *
+ * Designed to be used with Twitter Bootstrap
+ * By Naomi Cui
+ */
+ 
+.topic {
+	width: 800px;
+}
+
+.topic_head {}
+
+.topic_meta {
+	position: relative;
+	top: -10px;
+}
+
+.topic_url {
+	display: inline-block;
+}
+
+.reply {
+	position: relative;
+	top: -5px;
+}
+
+.reply_body {
+	display: none;
+}
+
+.comment {
+	width: 550px;
+	border-left: 3px solid #CCC;
+	padding-left: 10px;
+	margin-top: 4px;
+	margin-bottom: 17px;
+	position: relative;
+	left: 20px;
+}
+
+.comment_meta {}
