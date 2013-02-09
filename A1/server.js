@@ -4,6 +4,9 @@ var path = require('path');
 var url = require('url');
 
 var PORT = 8000;
+var IDIterator = 100000000000;
+var topicDB = {};
+var commentDB = {};
 
 MIME_TYPES = {
 	'.html': 'text/html',
@@ -12,6 +15,61 @@ MIME_TYPES = {
 	'.txt': 'text/plain'
 	//TODO: add image mime types
 };
+
+//generate and return an ID
+function getID(){
+	var ID = IDIterator.toString(36);
+	IDIterator++;
+	return ID;
+}
+
+/*
+ *get topics
+ * host- /topic
+ * method type: get
+ * send:{}
+ * receive: {"topic":[{"title":"somestring", "link":"somestring", "upvote": int,"topicID": ID},{},...]}
+ */
+
+/*
+ *get comments
+ * host- /topic/someid/comment
+ * method type: get
+ * send:{}
+ * recieve:{"comment": [{"body":"somestring","upvote":int, "commentID": ID},{}]} 
+ */
+
+/* 
+ *create a topic:
+ * host- /topic
+ * method type: post
+ * send: {"title" : "somestring", "link" : "somestring"}
+ * receive: {}
+ */
+
+/*
+ *create a comment to a topic:
+ * host-/topic/someid/comment
+ * method type: post
+ * send:{"topicID": "someid", "body": "somestring"}
+ * receive: {}
+ */
+
+/*
+ *create a comment to a comment:
+ * host-/topic/someid/comment/someid
+ * method type: post
+ * send:{"commentID": "someid", "body": "somestring", "topicID":"someid"}
+ * receive: {}
+ */
+
+ /*
+  *upvote a comment:
+  * host-/topic/someid/comment/someid
+  * method type: put
+  * send: {}
+  * receive: {}
+  */
 
 function serveFile(filePath, response) {
 	fs.exists(filePath, function(exists) {
@@ -44,8 +102,8 @@ function serveREST(response, method, urlParts){
 	
 	/*  3 types of REST calls
 	/topic(GET for a list of topic,POST to post a new topic+link)
-	/topic/nyannyannyan/comment(GET to grab all the comments to a topic,POST to reply to a topic or subcomment)
-	/topic/nyannyannyan/comment/456(POST or PUT to upvote)
+	/topic/nyannyannyan/comment(GET to grab all the comments to a topic,POST to reply to a topic)
+	/topic/nyannyannyan/comment/456(POST to reply to comment, PUT to upvote)
 	*/
 	
 	var result;
