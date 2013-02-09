@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title>CSC309 Assignment 1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -20,7 +20,7 @@
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="../assets/js/html5shiv.js"></script>
+      <script src="/html5shiv.js"></script>
     <![endif]-->
 
     <!-- Fav and touch icons -->
@@ -66,18 +66,22 @@
       	<span class="topic_url"><a href="javascript:void(0)"><small>(topic.url)</small></a></span>
       	</h3>
       </div>
-      <div class="topic_meta"><small>Post Info | # Comments | <a href="javascript:void(0)">reply</a></small></div>
+      <div class="topic_meta"><small>Post Info | <span class="num_comments"></span></small>
 		<div class="reply">
+		<a href="javascript:void(0)"><small>reply</small></a>
 			<div class="reply_body">
-				<textarea class="reply_form" rows="10"></textarea>
+				<textarea class="reply_form" rows="5"></textarea><br />
+				<button class="btn btn-small" type="button">Submit</button>
 			</div>
 		</div>
+	  </div>
 		  <div class="comment">
 			<div class="comment_meta"><small>Posted whenever | <a href="javascript:void(0)">link</a></small></div>
 			<p>This is a static example of a topic thread.</p>
 				<div class="reply"><a href="javascript:void(0)"><small>reply</small></a>
 					<div class="reply_body">
-						<textarea class="reply_form" rows="10"></textarea>
+						<textarea class="reply_form" rows="5"></textarea><br />
+				<button class="btn btn-small" type="button">Submit</button>
 					</div>
 				</div>
 		  </div>
@@ -89,7 +93,18 @@
 			how this looks when it's long and spans several lines.</p>
 			<div class="reply"><a href="javascript:void(0)"><small>reply</small></a>
 				<div class="reply_body">
-					<textarea class="reply_form" rows="10"></textarea>
+					<textarea class="reply_form" rows="5"></textarea><br />
+				<button class="btn btn-small" type="button">Submit</button>
+				</div>
+			</div>
+			<div class="comment">
+			<div class="comment_meta"><small>Posted whenever | <a href="javascript:void(0)">link</a></small></div>
+			<p>Whoa check it out this comment is nested.</p>
+				<div class="reply"><a href="javascript:void(0)"><small>reply</small></a>
+					<div class="reply_body">
+						<textarea class="reply_form" rows="5"></textarea><br />
+				<button class="btn btn-small" type="button">Submit</button>
+					</div>
 				</div>
 			</div>
 		  </div>
@@ -98,14 +113,24 @@
       <div class="topic">
       <div class="topic_head">
       	<h3>
-      	<a href="javascript:void(0)">Of course there may be more than one topic.</a>
+      	<a href="javascript:void(0)">This is 140 chars long. gqPgU HWMubFyyPbpqm dzbOQZFzaieec 
+      	STjvCopbjllOp prlhCQbRaINbU YsjXUbZXwJLNV XRCUdUAqLZvpO fkbWMNfurpNRo BStWkCAZFoxcq</a>
       	<span class="topic_url"><a href="javascript:void(0)"><small>(topic.url)</small></a></span>
       	</h3>
       </div>
-      <div class="topic_meta"><small>Post Info | # Comments | <a href="javascript:void(0)">reply</a></small></div>
+      <div class="topic_meta"><small>Post Info | <span class="num_comments"></span></small>
 		<div class="reply">
+		<a href="javascript:void(0)"><small>reply</small></a>
 			<div class="reply_body">
-				<textarea class="reply_form" rows="10"></textarea>
+				<textarea class="reply_form" rows="5"></textarea><br />
+				<button class="btn btn-small" type="button">Submit</button>
+			</div>
+		</div>
+	  </div>
+	  <div class="reply">
+			<div class="reply_body">
+				<textarea class="reply_form" rows="5"></textarea><br />
+				<button class="btn btn-small" type="button">Submit</button>
 			</div>
 	  </div>
       	
@@ -118,19 +143,21 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="../assets/js/jquery.js"></script>
-    <script src="../assets/js/bootstrap-transition.js"></script>
-    <script src="../assets/js/bootstrap-alert.js"></script>
-    <script src="../assets/js/bootstrap-modal.js"></script>
-    <script src="../assets/js/bootstrap-dropdown.js"></script>
-    <script src="../assets/js/bootstrap-scrollspy.js"></script>
-    <script src="../assets/js/bootstrap-tab.js"></script>
-    <script src="../assets/js/bootstrap-tooltip.js"></script>
-    <script src="../assets/js/bootstrap-popover.js"></script>
-    <script src="../assets/js/bootstrap-button.js"></script>
-    <script src="../assets/js/bootstrap-collapse.js"></script>
-    <script src="../assets/js/bootstrap-carousel.js"></script>
-    <script src="../assets/js/bootstrap-typeahead.js"></script>
+    <script src="/jquery.js"></script>
+    <script src="/bootstrap-transition.js"></script>
+    <script src="/bootstrap-alert.js"></script>
+    <script src="/bootstrap-modal.js"></script>
+    <script src="/bootstrap-dropdown.js"></script>
+    <script src="/bootstrap-scrollspy.js"></script>
+    <script src="/bootstrap-tab.js"></script>
+    <script src="/bootstrap-tooltip.js"></script>
+    <script src="/bootstrap-popover.js"></script>
+    <script src="/bootstrap-button.js"></script>
+    <script src="/bootstrap-collapse.js"></script>
+    <script src="/bootstrap-carousel.js"></script>
+    <script src="/bootstrap-typeahead.js"></script>
+    
+    <script src="/fun.js"></script>
 
   </body>
 </html>
