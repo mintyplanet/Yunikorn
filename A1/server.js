@@ -2,8 +2,9 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var url = require('url');
-var topic = require('./topic.js');
-var comment = require('./comment.js');
+var querystring = require('querystring');
+var topicObj = require('./topic.js');
+var commentObj = require('./comment.js');
 
 var PORT = 8000;
 var IDIterator = 100000000000;
@@ -37,9 +38,9 @@ function getNextID(){
  	var topiclist = new Array();
  	var topic;
  	for(topicID in topicDB){
- 		var topic = topicDB[topicID];
+ 		topic = topicDB[topicID];
  		topic["topicID"] = topicID;
- 		topiclist.push(result);
+ 		topiclist.push(topic);
  	}
  	topic = {};
  	topic["topic"] = topiclist;
@@ -74,7 +75,7 @@ function getCommentsOfComment(commentID){
  * recieve:{"comments": [{"body":"somestring","upvote":int, 
  * "comment":[{"body":"somestring",...},... ], "timestamp": "time"},...]} 
  */
-function getComments(response, topicID){
+ function getComments(response, topicID){
 	// is a topic
 		var commentlist = new Array();
 		for (commentID in topicDB[topicID].getComments()){
@@ -82,7 +83,7 @@ function getComments(response, topicID){
 		}
 		var result = {};
 		result["comments"] = commentlist;
-		responseJSON(response, result);
+		respondJSON(response, result);
 }
 
 /* 
@@ -93,13 +94,15 @@ function getComments(response, topicID){
  * receive: {"title": "somestring", "link": "somestring", "comments": ["someid",...], 
  * "upvote": int, timestamp": "time", "topicID": "someid"}
  */
-function createTopic(response, title, link){
-	var id = getNextID();
-	var newtopic = new topic(title, link);
+function createTopic(response, args){
+	var title = args["title"],
+		link = args["link"],
+		id = getNextID();
+	var newtopic = new topicObj(title, link);
 	topicDB[id] = newtopic;
 
 	newtopic["topicID"] = id;
-	responseJSON(response, newtopic);
+	respondJSON(response, newtopic);
 }
 
 /*
@@ -110,14 +113,17 @@ function createTopic(response, title, link){
  * receive: { "body": "somestring", "comment":["someid,..."], "upvote":int, 
  * "timestamp": "time", "commentID": "someid"}
  */
- function createTopicReply(response, topicID, body){
- 	var id = getNextID();
- 	var comment = new comment(body);
- 	topicDB[topicID].addComment(id);
+function createTopicReply(response, args){
+	var topicID = args["topicID"],
+		body = args["body"],
+ 		id = getNextID();
+ 	var comment = new commentObj(body);
+ 	var topic = topicDB[topicID];
+ 	topic.addComment();
  	commentDB[id] = comment;
 
  	comment["commentID"] = id;
- 	responseJSON(response, comment);
+ 	respondJSON(response, comment);
  }
 
 /*
@@ -128,14 +134,17 @@ function createTopic(response, title, link){
  * receive: { "body": "somestring", "comment":["someid",...], "upvote":int, 
  * "timestampe": "time", "commentID": "someid"}
  */
- function createCommentReply(response, commentID, body){
- 	var id = getNextID();
- 	var newcomment = new comment(body);
- 	commentDB[commentID].addComment(id);
+ function createCommentReply(response, args){
+ 	var commentID = args["commentID"],
+		body = args["body"],
+ 		id = getNextID();
+ 	var newcomment = new commentObj(body);
+ 	var comment = commentDB[commentID];
+ 	comment.addComment(id);
  	commentDB[id] = newcomment;
 
  	newcomment["commentID"] = id;
- 	responseJSON(response, newcomment);
+ 	respondJSON(response, newcomment);
 
  }
 
@@ -149,6 +158,7 @@ function createTopic(response, title, link){
 function voteup(response, topicID, commentID){
 	topicDB[topicID].voteup();
 	commentDB[commentID].voteup();
+	respondJSON(response, {});
 }
 
 function serveFile(filePath, response) {
@@ -177,7 +187,19 @@ function serveFile(filePath, response) {
 	});
 }
 
-function serveREST(response, method, urlParts){
+function handlePostRequest(request, response, callback){
+	var postBody = '';
+	request.on('data', function(chunk) {
+      	postBody += chunk.toString();
+    });
+    
+    request.on('end', function() {
+    	//console.log(postBody);
+    	callback(response, querystring.parse(postBody));
+    })
+}
+
+function serveREST(response, request, urlParts){
 	//console.log('accepted REST call '+urlParts.pathname);
 	
 	/*  3 types of REST calls
@@ -185,19 +207,33 @@ function serveREST(response, method, urlParts){
 	/topic/nyannyannyan/comment(GET to grab all the comments to a topic,POST to reply to a topic)
 	/topic/nyannyannyan/comment/456(POST to reply to comment, PUT to upvote)
 	*/
-	
+	var method = request.method;
 	var result;
-	if        (result=new RegExp("^/topic/?$").exec(urlParts.pathname)){
-		respondJSON(response, "topic");
+
+	console.log("[200] " + method + " to " + request.url);
+	if (result=new RegExp("^/topic/?$").exec(urlParts.pathname)){
+		if (method == "GET"){
+			getTopics(response);
+		} else { //post
+			handlePostRequest(request, response, createTopic);
+		}	
 		
 	} else if (result=new RegExp("^/topic/(\\w+)/comment/?$").exec(urlParts.pathname)){
 		var topicID = result[1];
-		respondJSON(response, {topicID:topicID});
-		
+		if (method == "GET"){
+			getComments(response, topicID);
+		} else { //post
+			handlePostRequest(request, response, createTopicReply);
+		}
+
 	} else if (result=new RegExp("^/topic/(\\w+)/comment/(\\w+)/?$").exec(urlParts.pathname)){
 		var topicID = result[1],
 			commentID = result[2];
-		respondJSON(response, {topicID:topicID, commentID:commentID});
+		if (method == "PUT"){
+			voteup(response, topicID, commentID);
+		} else { //post
+			handlePostRequest(request, response, createCommentReply);
+		}
 		
 	} else {
 		response.writeHead(404);
@@ -220,7 +256,7 @@ http.createServer(function(request, response) {
 		pathname = urlParts.pathname;
 	//All REST calls 
 	if (pathname.match(/\/topic/)) {
-		serveREST(response, request.method, urlParts);
+		serveREST(response, request, urlParts);
 	} else {
 		pathname = (pathname=='/') ? '/index.html' : pathname;
 		serveFile('.'+pathname, response);
