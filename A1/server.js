@@ -2,6 +2,8 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var url = require('url');
+var topic = require('./topic.js');
+var comment = require('./comment.js');
 
 var PORT = 8000;
 var IDIterator = 100000000000;
@@ -17,7 +19,7 @@ MIME_TYPES = {
 };
 
 //generate and return an ID
-function getID(){
+function getNextID(){
 	var ID = IDIterator.toString(36);
 	IDIterator++;
 	return ID;
@@ -28,48 +30,124 @@ function getID(){
  * host- /topic
  * method type: get
  * send:{}
- * receive: {"topic":[{"title":"somestring", "link":"somestring", "upvote": int,"topicID": ID},{},...]}
+ * receive: {"topic":[{"title":"somestring", "link":"somestring", "upvote": int, 
+ * "timestamp": "time", topicID": ID}, ...]}
  */
+ function getTopics(response){
+ 	var topiclist = new Array();
+ 	var topic;
+ 	for(topicID in topicDB){
+ 		var topic = topicDB[topicID];
+ 		topic["topicID"] = topicID;
+ 		topiclist.push(result);
+ 	}
+ 	topic = {};
+ 	topic["topic"] = topiclist;
+ 	respondJSON(response, topic);
+ } 
 
 /*
- *get comments
+ *get comments of a topic
  * host- /topic/someid/comment
  * method type: get
  * send:{}
- * recieve:{"comment": [{"body":"somestring","upvote":int, "commentID": ID},{}]} 
+ * recieve:{"comments": [{"body":"somestring","upvote":int, 
+ * "comment":[{"body":"somestring",...},... ], "timestamp": "time"},...]} 
  */
+function getComments(response, ID){
+	// is a topic
+	if (ID in topicDB){
+		var commentlist = new Array();
+		for (commentID in topicDB[ID].getComments()){
+			commentlist.push(getComments(response, commentID));
+		}
+		var result = {};
+		result["comments"] = commentlist;
+		responseJSON(response, result);
+	//is a comment
+	} else{
+		var comment = commentDB[ID];
+		var subcommentlist = comment.getComments();
+		delete comment["comment"];
+
+		if (subcommentlist == []){
+			return comment;
+		} else{
+			var commentlist = new Array();
+			for (subcommentID in subcommentlist){
+				commentlist.push(getComments(response, subcommentID));
+			}
+			comment["comment"] = commentlist;
+			return comment;
+		}
+	}
+}
 
 /* 
  *create a topic:
  * host- /topic
  * method type: post
  * send: {"title" : "somestring", "link" : "somestring"}
- * receive: {}
+ * receive: {"title": "somestring", "link": "somestring", "comments": ["someid",...], 
+ * "upvote": int, timestamp": "time", "topicID": "someid"}
  */
+function createTopic(response, title, link){
+	var id = getNextID();
+	var newtopic = new topic(title, link);
+	topicDB[id] = newtopic;
+
+	newtopic["topicID"] = id;
+	responseJSON(response, newtopic);
+}
 
 /*
  *create a comment to a topic:
  * host-/topic/someid/comment
  * method type: post
  * send:{"topicID": "someid", "body": "somestring"}
- * receive: {}
+ * receive: { "body": "somestring", "comment":["someid,..."], "upvote":int, 
+ * "timestamp": "time", "commentID": "someid"}
  */
+ function createTopicReply(response, topicID, body){
+ 	var id = getNextID();
+ 	var comment = new comment(body);
+ 	topicDB[topicID].addComment(id);
+ 	commentDB[id] = comment;
+
+ 	comment["commentID"] = id;
+ 	responseJSON(response, comment);
+ }
 
 /*
  *create a comment to a comment:
  * host-/topic/someid/comment/someid
  * method type: post
- * send:{"commentID": "someid", "body": "somestring", "topicID":"someid"}
+ * send:{ "body": "somestring", "commentID": "someid"}
+ * receive: { "body": "somestring", "comment":["someid",...], "upvote":int, 
+ * "timestampe": "time", "commentID": "someid"}
+ */
+ function createCommentReply(response, commentID, body){
+ 	var id = getNextID();
+ 	var newcomment = new comment(body);
+ 	commentDB[commentID].addComment(id);
+ 	commentDB[id] = newcomment;
+
+ 	newcomment["commentID"] = id;
+ 	responseJSON(response, newcomment);
+
+ }
+
+/*
+ *upvote a comment:
+ * host-/topic/someid/comment/someid
+ * method type: put
+ * send: {}
  * receive: {}
  */
-
- /*
-  *upvote a comment:
-  * host-/topic/someid/comment/someid
-  * method type: put
-  * send: {}
-  * receive: {}
-  */
+function voteup(response, topicID, commentID){
+	topicDB[topicID].voteup();
+	commentDB[commentID].voteup();
+}
 
 function serveFile(filePath, response) {
 	fs.exists(filePath, function(exists) {
