@@ -33,10 +33,11 @@ function getNextID(){
  * send:{}
  * receive: {"topic":[{"title":"somestring", "link":"somestring", "upvote": int, 
  * "timestamp": "time", topicID": ID}, ...]}
- */
+*/ 
  function getTopics(response){
  	var topiclist = new Array();
  	var topic;
+ 	//console.log(topicDB);
  	for(topicID in topicDB){
  		topic = topicDB[topicID];
  		topic["topicID"] = topicID;
@@ -67,6 +68,7 @@ function getCommentsOfComment(commentID){
 		return comment;
 	}
 }
+
 /*
  *get comments of a topic
  * host- /topic/someid/comment
@@ -76,14 +78,18 @@ function getCommentsOfComment(commentID){
  * "comment":[{"body":"somestring",...},... ], "timestamp": "time"},...]} 
  */
  function getComments(response, topicID){
-	// is a topic
-		var commentlist = new Array();
-		for (commentID in topicDB[topicID].getComments()){
+	var commentlist = new Array();
+	if (topicID in topicDB){
+		var topic = topicDB[topicID];
+		for (commentID in topic.getComments()){
 			commentlist.push(getCommentsOfComment(commentID));
 		}
 		var result = {};
 		result["comments"] = commentlist;
 		respondJSON(response, result);
+	} else {
+		respondJSON(response, {err: "Topic not found"});
+	}
 }
 
 /* 
@@ -113,17 +119,20 @@ function createTopic(response, args){
  * receive: { "body": "somestring", "comment":["someid,..."], "upvote":int, 
  * "timestamp": "time", "commentID": "someid"}
  */
-function createTopicReply(response, args){
-	var topicID = args["topicID"],
-		body = args["body"],
+function createTopicReply(response, args, topicID){
+	var body = args["body"],
  		id = getNextID();
  	var comment = new commentObj(body);
- 	var topic = topicDB[topicID];
- 	topic.addComment();
- 	commentDB[id] = comment;
+ 	if (topicID in topicDB){
+ 		var topic = topicDB[topicID];
+ 		topic.addComment(id);
+ 		commentDB[id] = comment;
 
- 	comment["commentID"] = id;
- 	respondJSON(response, comment);
+ 		comment["commentID"] = id;
+ 		respondJSON(response, comment);
+ 	} else {
+ 		respondJSON(response, {err: "Topic not found"});
+ 	}	
  }
 
 /*
@@ -134,31 +143,42 @@ function createTopicReply(response, args){
  * receive: { "body": "somestring", "comment":["someid",...], "upvote":int, 
  * "timestampe": "time", "commentID": "someid"}
  */
- function createCommentReply(response, args){
- 	var commentID = args["commentID"],
-		body = args["body"],
+ function createCommentReply(response, args, commentID){
+ 	var body = args["body"],
  		id = getNextID();
  	var newcomment = new commentObj(body);
- 	var comment = commentDB[commentID];
- 	comment.addComment(id);
- 	commentDB[id] = newcomment;
+ 	if (commentID in commentDB){
+ 		var comment = commentDB[commentID];
+ 		comment.addComment(id);
+ 		commentDB[id] = newcomment;
 
- 	newcomment["commentID"] = id;
- 	respondJSON(response, newcomment);
-
+ 		newcomment["commentID"] = id;
+ 		respondJSON(response, newcomment);
+ 	} else {
+ 		respondJSON(response, {err: "Comment not found"});
+ 	}
  }
 
-/*
- *upvote a comment:
+
+ /*upvote a comment:
  * host-/topic/someid/comment/someid
  * method type: put
  * send: {}
  * receive: {}
  */
 function voteup(response, topicID, commentID){
-	topicDB[topicID].voteup();
-	commentDB[commentID].voteup();
-	respondJSON(response, {});
+	if (topicID in topicDB){
+		topicDB[topicID].voteup();
+	} else {
+		respondJSON(response, {err: "Topic not found"});
+	}
+
+	if (commentID in commentDB){
+		commentDB[commentID].voteup();
+	} else {
+		respondJSON(response, {err: "Comment not found"});
+	}
+	respondJSON(response, {Success: 200});
 }
 
 function serveFile(filePath, response) {
@@ -187,7 +207,7 @@ function serveFile(filePath, response) {
 	});
 }
 
-function handlePostRequest(request, response, callback){
+function handlePostRequest(request, response, callback, ID){
 	var postBody = '';
 	request.on('data', function(chunk) {
       	postBody += chunk.toString();
@@ -195,8 +215,12 @@ function handlePostRequest(request, response, callback){
     
     request.on('end', function() {
     	//console.log(postBody);
-    	callback(response, querystring.parse(postBody));
-    })
+    	if (callback == createTopic){
+    		callback(response, querystring.parse(postBody));
+    	} else {
+    		callback(response, querystring.parse(postBody), ID);
+    	}
+    });
 }
 
 function serveREST(response, request, urlParts){
@@ -221,9 +245,10 @@ function serveREST(response, request, urlParts){
 	} else if (result=new RegExp("^/topic/(\\w+)/comment/?$").exec(urlParts.pathname)){
 		var topicID = result[1];
 		if (method == "GET"){
+			console.log(topicID);
 			getComments(response, topicID);
 		} else { //post
-			handlePostRequest(request, response, createTopicReply);
+			handlePostRequest(request, response, createTopicReply, topicID);
 		}
 
 	} else if (result=new RegExp("^/topic/(\\w+)/comment/(\\w+)/?$").exec(urlParts.pathname)){
@@ -232,7 +257,7 @@ function serveREST(response, request, urlParts){
 		if (method == "PUT"){
 			voteup(response, topicID, commentID);
 		} else { //post
-			handlePostRequest(request, response, createCommentReply);
+			handlePostRequest(request, response, createCommentReply, commentID);
 		}
 		
 	} else {
