@@ -5,6 +5,7 @@ function Topic(title, link) {
   this.link = link;
   this.comment = new Array();
   this.upvote = 0;
+  this.timestamp = new Date();
 }
 
 Topic.prototype = {
@@ -29,10 +30,17 @@ Topic.prototype = {
 		return this.upvote;
 	},
 
+	//return the timestamp
+	getTimestamp: function(){
+		return this.timestamp;
+	},
+
+	//add commentID to the list of comments
 	addComment: function(commentID){
 		this.comment.push(commentID);
 	},
 
+	//increment the upvote of the topic by one
 	voteup: function(){
 		this.upvote++;
 	}
