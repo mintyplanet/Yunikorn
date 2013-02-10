@@ -47,6 +47,26 @@ function getNextID(){
  } 
 
 /*
+ *Helper function for get comment
+ * given an commentID, return a string that represent itself and its subcomments.
+ */
+function getCommentsOfComment(commentID){
+	var comment = commentDB[commentID];
+	var subcommentlist = comment.getComments();
+	delete comment["comment"];
+
+	if (subcommentlist == []){
+		return comment;
+	} else{
+		var commentlist = new Array();
+		for (subcommentID in subcommentlist){
+			commentlist.push(getCommentsOfComment(subcommentID));
+		}
+		comment["comment"] = commentlist;
+		return comment;
+	}
+}
+/*
  *get comments of a topic
  * host- /topic/someid/comment
  * method type: get
@@ -54,33 +74,15 @@ function getNextID(){
  * recieve:{"comments": [{"body":"somestring","upvote":int, 
  * "comment":[{"body":"somestring",...},... ], "timestamp": "time"},...]} 
  */
-function getComments(response, ID){
+function getComments(response, topicID){
 	// is a topic
-	if (ID in topicDB){
 		var commentlist = new Array();
-		for (commentID in topicDB[ID].getComments()){
-			commentlist.push(getComments(response, commentID));
+		for (commentID in topicDB[topicID].getComments()){
+			commentlist.push(getCommentsOfComment(commentID));
 		}
 		var result = {};
 		result["comments"] = commentlist;
 		responseJSON(response, result);
-	//is a comment
-	} else{
-		var comment = commentDB[ID];
-		var subcommentlist = comment.getComments();
-		delete comment["comment"];
-
-		if (subcommentlist == []){
-			return comment;
-		} else{
-			var commentlist = new Array();
-			for (subcommentID in subcommentlist){
-				commentlist.push(getComments(response, subcommentID));
-			}
-			comment["comment"] = commentlist;
-			return comment;
-		}
-	}
 }
 
 /* 
@@ -225,4 +227,3 @@ http.createServer(function(request, response) {
 	}
 }).listen(PORT);
 console.log("server running on http://127.0.0.1:" + PORT + '/');
-
