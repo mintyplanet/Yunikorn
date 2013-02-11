@@ -37,7 +37,8 @@ function getNextID(){
  function getTopics(response){
  	var topiclist = new Array();
  	var topic;
- 	//console.log(topicDB);
+ 	
+ 	//go through all the topic in the database and return them.
  	for(topicID in topicDB){
  		topic = topicDB[topicID];
  		topic["topicID"] = topicID;
@@ -45,7 +46,7 @@ function getNextID(){
  	}
  	topic = {};
  	topic["topic"] = topiclist;
- 	respondJSON(response, topic);
+ 	respondJSON(response, topic, 200);
  }
 
 /*
@@ -64,11 +65,14 @@ function cloneComment(comment){
  * given an commentID, return a string that represent itself and its subcomments.
  */
 function getCommentsOfComment(commentID){
-	var comment = commentDB[commentID];
-	var subcommentlist = comment.getComments();
+	var comment = commentDB[commentID],
+		subcommentlist = comment.getComments(),
+		commentlist = new Array();
 	comment = cloneComment(comment);
-	var commentlist = new Array();
+	comment["commentID"] = commentID;
 	
+	
+	// loop thru the list of subcomment and get the comment's data
 	for (var i = 0; i < subcommentlist.length; i++){
 		commentlist.push(getCommentsOfComment(subcommentlist[i]));
 	}
@@ -85,19 +89,20 @@ function getCommentsOfComment(commentID){
  * "comment":[{"body":"somestring",...},... ], "timestamp": "time"},...]} 
  */
  function getComments(response, topicID){
-	var commentlist = new Array();
 	if (topicID in topicDB){
-		var topic = topicDB[topicID];
-	//	console.log(topic);
-		var listofcomment = topic.getComments();
+		var commentlist = new Array(),
+		 	topic = topicDB[topicID],
+			listofcomment = topic.getComments();
+
+		//loop thru all the comments and get the comment's data
 		for (var i = 0; i < listofcomment.length; i++){
 			commentlist.push(getCommentsOfComment(listofcomment[i]));
 		}
 		var result = {};
 		result["comments"] = commentlist;
-		respondJSON(response, result);
+		respondJSON(response, result, 200);
 	} else {
-		respondJSON(response, {err: "Topic not found"});
+		respondJSON(response, {err: "Topic not found"}, 404);
 	}
 }
 
@@ -111,13 +116,17 @@ function getCommentsOfComment(commentID){
  */
 function createTopic(response, args){
 	var title = args["title"],
-		link = args["link"],
-		id = getNextID();
-	var newtopic = new topicObj(title, link);
-	topicDB[id] = newtopic;
+		link = args["link"];
+	if ((title && link) != null){
+		var id = getNextID(),
+			newtopic = new topicObj(title, link);
+		topicDB[id] = newtopic;
 
-	newtopic["topicID"] = id;
-	respondJSON(response, newtopic);
+		newtopic["topicID"] = id;
+		respondJSON(response, newtopic, 201);
+	} else {
+		respondJSON(response, {err : "invalid input"}, 400)
+	}
 }
 
 /*
@@ -129,18 +138,20 @@ function createTopic(response, args){
  * "timestamp": "time", "commentID": "someid"}
  */
 function createTopicReply(response, args, topicID){
-	var body = args["body"],
- 		id = getNextID();
- 	var comment = new commentObj(body);
+	
  	if (topicID in topicDB){
- 		var topic = topicDB[topicID];
+		var body = args["body"],
+ 			id = getNextID(),
+ 			comment = new commentObj(body),
+ 			topic = topicDB[topicID];
+
+ 		// add commentID topic
  		topic.addComment(id);
  		commentDB[id] = comment;
-
  		comment["commentID"] = id;
- 		respondJSON(response, comment);
+ 		respondJSON(response, comment, 201);
  	} else {
- 		respondJSON(response, {err: "Topic not found"});
+ 		respondJSON(response, {err: "Topic not found"}, 404);
  	}	
  }
 
@@ -153,18 +164,19 @@ function createTopicReply(response, args, topicID){
  * "timestampe": "time", "commentID": "someid"}
  */
  function createCommentReply(response, args, commentID){
- 	var body = args["body"],
- 		id = getNextID();
- 	var newcomment = new commentObj(body);
  	if (commentID in commentDB){
- 		var comment = commentDB[commentID];
+ 		var body = args["body"],
+ 			id = getNextID(),
+ 			newcomment = new commentObj(body),
+ 			comment = commentDB[commentID];
+ 		
+ 		// add comment into ParentComment
  		comment.addComment(id);
  		commentDB[id] = newcomment;
-
  		newcomment["commentID"] = id;
- 		respondJSON(response, newcomment);
+ 		respondJSON(response, newcomment, 201);
  	} else {
- 		respondJSON(response, {err: "Comment not found"});
+ 		respondJSON(response, {err: "Comment not found"}, 404);
  	}
  }
 
@@ -177,17 +189,19 @@ function createTopicReply(response, args, topicID){
  */
 function voteup(response, topicID, commentID){
 	if (topicID in topicDB){
+		// update the vote in the topic
 		topicDB[topicID].voteup();
 	} else {
-		respondJSON(response, {err: "Topic not found"});
+		respondJSON(response, {err: "Topic not found"}, 404);
 	}
 
 	if (commentID in commentDB){
+		// update the vote in the comment
 		commentDB[commentID].voteup();
 	} else {
-		respondJSON(response, {err: "Comment not found"});
+		respondJSON(response, {err: "Comment not found"}, 404);
 	}
-	respondJSON(response, {Success: 200});
+	respondJSON(response, {Success: "upvoted"}, 202);
 }
 
 function serveFile(filePath, response) {
@@ -222,8 +236,8 @@ function handlePostRequest(request, response, callback, ID){
       	postBody += chunk.toString();
     });
     
+    //extract the post data, and send the data to the right function
     request.on('end', function() {
-    	//console.log(postBody);
     	if (callback == createTopic){
     		callback(response, querystring.parse(postBody));
     	} else {
@@ -256,6 +270,7 @@ function serveREST(response, request, urlParts){
 		if (method == "GET"){
 			getComments(response, topicID);
 		} else { //post
+			//doesn't need an ID parameter.
 			handlePostRequest(request, response, createTopicReply, topicID);
 		}
 
@@ -276,9 +291,9 @@ function serveREST(response, request, urlParts){
 }
 
 //Just sends out a JSON.stringified object and also log to console for debugging
-function respondJSON(response, obj){
+function respondJSON(response, obj, status){
 	var stringy = JSON.stringify(obj);
-	response.writeHead(200, {'Content-type': 'application/json'});
+	response.writeHead(status, {'Content-type': 'application/json'});
 	response.end(stringy);
 	console.log(stringy);
 }
