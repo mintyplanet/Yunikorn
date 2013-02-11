@@ -46,7 +46,18 @@ function getNextID(){
  	topic = {};
  	topic["topic"] = topiclist;
  	respondJSON(response, topic);
- } 
+ }
+
+/*
+ * return a copy of comment.
+ */
+function cloneComment(comment){
+	var copy = {};
+	copy['body'] = comment.getBody();
+	copy['upvote'] = comment.getupvote();
+	copy['timestamp'] = comment.getTimestamp();
+	return copy;
+}
 
 /*
  *Helper function for get comment
@@ -55,18 +66,14 @@ function getNextID(){
 function getCommentsOfComment(commentID){
 	var comment = commentDB[commentID];
 	var subcommentlist = comment.getComments();
-	delete comment["comment"];
-
-	if (subcommentlist == []){
-		return comment;
-	} else{
-		var commentlist = new Array();
-		for (subcommentID in subcommentlist){
-			commentlist.push(getCommentsOfComment(subcommentID));
-		}
-		comment["comment"] = commentlist;
-		return comment;
+	comment = cloneComment(comment);
+	var commentlist = new Array();
+	
+	for (var i = 0; i < subcommentlist.length; i++){
+		commentlist.push(getCommentsOfComment(subcommentlist[i]));
 	}
+	comment["comment"] = commentlist;
+	return comment;
 }
 
 /*
@@ -81,8 +88,10 @@ function getCommentsOfComment(commentID){
 	var commentlist = new Array();
 	if (topicID in topicDB){
 		var topic = topicDB[topicID];
-		for (commentID in topic.getComments()){
-			commentlist.push(getCommentsOfComment(commentID));
+	//	console.log(topic);
+		var listofcomment = topic.getComments();
+		for (var i = 0; i < listofcomment.length; i++){
+			commentlist.push(getCommentsOfComment(listofcomment[i]));
 		}
 		var result = {};
 		result["comments"] = commentlist;
@@ -245,7 +254,6 @@ function serveREST(response, request, urlParts){
 	} else if (result=new RegExp("^/topic/(\\w+)/comment/?$").exec(urlParts.pathname)){
 		var topicID = result[1];
 		if (method == "GET"){
-			console.log(topicID);
 			getComments(response, topicID);
 		} else { //post
 			handlePostRequest(request, response, createTopicReply, topicID);
