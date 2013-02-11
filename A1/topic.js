@@ -22,7 +22,7 @@ Topic.prototype = {
 
 	//return a list of comments
 	getComments: function(){
-		return this.commentArray;
+		return this.comment;
 	},
 
 	// return the number of upvote the comments of this topic received.
