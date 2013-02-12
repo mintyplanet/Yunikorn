@@ -1,9 +1,9 @@
 // toggles display of the child reply_body div of a reply div
-$('.reply').on('click', function () {
+$(document).on('click', '.reply', function () {
 	$(this).children('.reply_body').toggle();
 });
 
-$('.reply_body').on('click', function (event) {
+$(document).on('click', '.reply', function (event) {
 	event.stopPropagation();
 });
 
