@@ -58,7 +58,21 @@
       <h1>SimpleThread</h1>
       <p>Talk about stuff anonymously.</p>
       <p>A project by Karin N., Kevin Y., Naomi C., & Yuki S.</p>
-      
+	  
+	  <!-- Post a topic => change! Only added so that could connect to backend -->
+	  <div class="postTopic">
+		<br>
+		<h3 style="color:green"><b>Post a Topic!</b></h3>
+			<div class="add_topic">
+				<textarea class="topic_title_form" rows="1">Title</textarea><br />
+				<textarea class="topic_link_form" rows="1">Link</textarea><br />
+				<button class="btn btn-post" type="button">Post!</button>
+			</div>
+		</div>
+		<br>
+	
+      <!-- End of change -->
+	  
       <div class="topic">
       <div class="topic_head">
       	<h3>
@@ -158,6 +172,9 @@
     <script src="/bootstrap-typeahead.js"></script>
     
     <script src="/fun.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script src="/submitComment.js"></script>
+	<script src="/postTopic.js"></script>
 
   </body>
 </html>
