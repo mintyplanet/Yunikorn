@@ -1,6 +1,6 @@
 #!/bin/sh
 
-SERVER=http://localhost:8000
+SERVER=http://localhost:31335
 
 # Post a bunch of topics
 curl ${SERVER}/topic -d "title=Look at all these cats&link=www.nyancat.com"
