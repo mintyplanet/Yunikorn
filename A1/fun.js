@@ -18,3 +18,5 @@ $(window).on('load', function () {
 		}
 	});
 });
+
+//display topics in order??
