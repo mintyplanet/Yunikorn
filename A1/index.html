@@ -53,7 +53,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container" id="copy-contain">
 
       <h1>SimpleThread</h1>
       <p>Talk about stuff anonymously.</p>
@@ -72,8 +72,10 @@
 		<br>
 	
       <!-- End of change -->
-	  
-      <div class="topic">
+
+    </div>
+    
+	<div class="topic" id="testTop" style="display: none">
       <div class="topic_head">
       	<h3>
       	<a href="javascript:void(0)">Topic title</a>
@@ -88,70 +90,19 @@
 				<button class="btn btn-small" type="button">Submit</button>
 			</div>
 		</div>
-	  </div>
-		  <div class="comment">
-			<div class="comment_meta"><small>Posted whenever | <a href="javascript:void(0)">link</a></small></div>
-			<p>This is a static example of a topic thread.</p>
-				<div class="reply"><a href="javascript:void(0)"><small>reply</small></a>
-					<div class="reply_body">
-						<textarea class="reply_form" rows="5"></textarea><br />
-				<button class="btn btn-small" type="button">Submit</button>
-					</div>
-				</div>
-		  </div>
-		  <div class="comment">
-			<div class="comment_meta"><small>Posted whenever | <a href="javascript:void(0)">link</a></small></div>
-			<p>There may be several comments, of course. And sometimes they may get really long.</p>
-			<p>Or span several paragraphs. I'm not sure if I should put the comment body in its own div 
-			within the comment class or if that's pointless/excessive. I'm just filling up space to see 
-			how this looks when it's long and spans several lines.</p>
+	  </div> 
+      </div>
+	  
+	<div class="comment" id="testCom" style="display: none">
+		<div class="comment_meta"><small>Posted whenever | <a href="javascript:void(0)">link</a></small></div>
+		<p>This is a static example of a topic thread.</p>
 			<div class="reply"><a href="javascript:void(0)"><small>reply</small></a>
 				<div class="reply_body">
 					<textarea class="reply_form" rows="5"></textarea><br />
-				<button class="btn btn-small" type="button">Submit</button>
+			<button class="btn btn-small" type="button">Submit</button>
 				</div>
 			</div>
-			<div class="comment">
-			<div class="comment_meta"><small>Posted whenever | <a href="javascript:void(0)">link</a></small></div>
-			<p>Whoa check it out this comment is nested.</p>
-				<div class="reply"><a href="javascript:void(0)"><small>reply</small></a>
-					<div class="reply_body">
-						<textarea class="reply_form" rows="5"></textarea><br />
-				<button class="btn btn-small" type="button">Submit</button>
-					</div>
-				</div>
-			</div>
-		  </div>
-      </div>
-      
-      <div class="topic">
-      <div class="topic_head">
-      	<h3>
-      	<a href="javascript:void(0)">This is 140 chars long. gqPgU HWMubFyyPbpqm dzbOQZFzaieec 
-      	STjvCopbjllOp prlhCQbRaINbU YsjXUbZXwJLNV XRCUdUAqLZvpO fkbWMNfurpNRo BStWkCAZFoxcq</a>
-      	<span class="topic_url"><a href="javascript:void(0)"><small>(topic.url)</small></a></span>
-      	</h3>
-      </div>
-      <div class="topic_meta"><small>Post Info | <span class="num_comments"></span></small>
-		<div class="reply">
-		<a href="javascript:void(0)"><small>reply</small></a>
-			<div class="reply_body">
-				<textarea class="reply_form" rows="5"></textarea><br />
-				<button class="btn btn-small" type="button">Submit</button>
-			</div>
-		</div>
-	  </div>
-	  <div class="reply">
-			<div class="reply_body">
-				<textarea class="reply_form" rows="5"></textarea><br />
-				<button class="btn btn-small" type="button">Submit</button>
-			</div>
-	  </div>
-      	
-    </div> 
-    
-    </div>
-    
+	</div>
     <!-- /container -->
 
     <!-- Le javascript
