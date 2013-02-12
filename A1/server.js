@@ -257,7 +257,7 @@ function serveREST(response, request, urlParts){
 	var method = request.method;
 	var result;
 
-	console.log("[200] " + method + " to " + request.url);
+	//console.log("[200] " + method + " to " + request.url);
 	if (result=new RegExp("^/topic/?$").exec(urlParts.pathname)){
 		if (method == "GET"){
 			getTopics(response);
@@ -295,7 +295,7 @@ function respondJSON(response, obj, status){
 	var stringy = JSON.stringify(obj);
 	response.writeHead(status, {'Content-type': 'application/json'});
 	response.end(stringy);
-	console.log(stringy);
+	console.log("==>"+stringy);
 }
 
 http.createServer(function(request, response) {
