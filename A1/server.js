@@ -6,7 +6,7 @@ var querystring = require('querystring');
 var topicObj = require('./topic.js');
 var commentObj = require('./comment.js');
 
-var PORT = 8000;
+var PORT = 31335;
 var IDIterator = 100000000000;
 var topicDB = {};
 var commentDB = {};
