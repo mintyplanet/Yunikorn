@@ -14,7 +14,8 @@ $(document).ready(function(){
 					style:"display: inline"}).appendTo("#" + commId);
 						
 				// Change topic information
-				$("#"+data.commentID).children("div.comment_meta").children("small").html(data.timestamp);
+				$("#"+data.commentID).children("div.comment_meta").children("small").html(
+				new Date(data.timestamp).toLocaleString());
 				$("#"+data.commentID).children("p").html(data.body);
 			}).fail(function() { alert("error"); });
   });
