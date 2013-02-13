@@ -48,6 +48,7 @@ Topic.prototype = {
 	//increment the upvote of the topic by one
 	voteup: function(){
 		this.upvote++;
+		return this.upvote;
 	}
 }
 

@@ -192,7 +192,8 @@ function createTopicReply(response, args, topicID){
 function voteup(response, topicID, commentID){
 	if (topicID in topicDB){
 		// update the vote in the topic
-		topicDB[topicID].voteup();
+		var topic = topicDB[topicID];
+		var upvote = topic.voteup();
 	} else {
 		respondJSON(response, {err: "Topic not found"}, 404);
 	}
@@ -203,7 +204,11 @@ function voteup(response, topicID, commentID){
 	} else {
 		respondJSON(response, {err: "Comment not found"}, 404);
 	}
-	respondJSON(response, {Success: "upvoted"}, 202);
+	
+	//return the number of upvote in the topic.
+	var respond = {};
+	respond["upvote"] = upvote;
+	respondJSON(response, respond, 202);
 }
 
 function serveFile(filePath, response) {
