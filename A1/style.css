@@ -9,7 +9,9 @@
 	width: 800px;
 }
 
-.topic_head {}
+.topic_head {
+	display: block;
+}
 
 .topic_meta {
 	position: relative;
