@@ -45,8 +45,7 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li><a href="#about" data-toggle="modal" data-target="#instructionModal">Instructions</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -72,7 +71,27 @@
 		<br>
 
       <!-- End of change -->
-
+    </div>
+    
+    <div id="instructionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="instructionModalLabel" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<h3 id="myModalLabel">Instructions</h3>
+		</div>
+		<div class="modal-body">
+			<h4>Posting</h4>
+			<p>
+				Post topics by using the form below. As Topics are posted, they will show up in the list of topics.
+				You can comment on the topics by clicking the reply button, and similarly for commenting on these comments.
+			</p>
+			<br/>
+			<h4>Upvoting</h4>
+			<p>You can upvote comments by clicking on the up arrow next to each comments.</p>
+		</div>
+			<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			</div>
+		</div>
     </div>
     
 	<div class="topic" id="testTop" style="display: none">
@@ -110,21 +129,9 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/jquery.js"></script>
-    <script src="/bootstrap-transition.js"></script>
-    <script src="/bootstrap-alert.js"></script>
-    <script src="/bootstrap-modal.js"></script>
-    <script src="/bootstrap-dropdown.js"></script>
-    <script src="/bootstrap-scrollspy.js"></script>
-    <script src="/bootstrap-tab.js"></script>
-    <script src="/bootstrap-tooltip.js"></script>
-    <script src="/bootstrap-popover.js"></script>
-    <script src="/bootstrap-button.js"></script>
-    <script src="/bootstrap-collapse.js"></script>
-    <script src="/bootstrap-carousel.js"></script>
-    <script src="/bootstrap-typeahead.js"></script>
+    <script src="/bootstrap.js"></script>
     
     <script src="/fun.js"></script>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<script src="/submitComment.js"></script>
 	<script src="/commOfComm.js"></script>
 	<script src="/postTopic.js"></script>
