@@ -73,7 +73,7 @@
       <!-- End of change -->
     </div>
     
-    <div id="instructionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="instructionModalLabel" aria-hidden="true">
+	<div id="instructionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="instructionModalLabel" aria-hidden="true">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 			<h3 id="myModalLabel">Instructions</h3>
@@ -93,16 +93,19 @@
 			</div>
 		</div>
     </div>
-    
+	
 	<div class="topic" id="testTop" style="display: none">
       <div class="topic_head">
       	<h3>
-      	<a href="javascript:void(0)" class="up">⬆</a>&nbsp;
       	<a href="javascript:void(0)" class="topic_title">Topic title</a>
-      	<span class="topic_url"><a href="javascript:void(0)"><small>(topic.url)</small></a></span>
+		<span class="topic_url"><a href="javascript:void(0)"><small>(topic.url)</small></a></span>
       	</h3>
       </div>
-      <div class="topic_meta"><small>Post Info | <span class="num_comments"></span></small>
+      <div class="topic_meta">	
+		<small>Post Info | 
+			<span class="num_comments"></span>
+			<span class="topic_votes">| 0 Votes</span>
+		</small>
 		<div class="reply">
 		<a href="javascript:void(0)" class="reply_button"><small>reply</small></a>
 			<div class="reply_body">
@@ -114,8 +117,15 @@
       </div>
 	  
 	<div class="comment" id="testCom" style="display: none">
-		<div class="comment_meta"><small class="timestamp">Posted whenever</small></div>
-		<p class="comment_body">This is a static example of a topic thread.</p>
+		<div class="comment_meta">
+			<small class="voteNum" style="color:green">0</small>
+			<small class="timestamp">Posted whenever</small>
+		</div>
+		
+		<p class="comment_body">
+			<a href="javascript:void(0)" class="up">⬆</a>&nbsp;		
+			<span id="bodyText">This is a static example of a topic thread.</span>
+		</p>
 			<div class="reply"><a href="javascript:void(0)" class="reply_button"><small>reply</small></a>
 				<div class="reply_body">
 					<textarea class="reply_form" rows="5"></textarea><br />
@@ -129,14 +139,15 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/jquery.js"></script>
-    <script src="/bootstrap.js"></script>
-    
+	<script src="/bootstrap.js"></script>
     <script src="/fun.js"></script>
+
 	<script src="/submitComment.js"></script>
 	<script src="/commOfComm.js"></script>
 	<script src="/postTopic.js"></script>
 	<script src="/getTopics.js"></script>
 	<script src="/getComments.js"></script>
+	<script src="/upvote.js"></script>
 
   </body>
 </html>

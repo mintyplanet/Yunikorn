@@ -14,10 +14,9 @@ $(document).ready(function(){
 					id:data.commentID,
 					style:"display: inline"}).appendTo("#" + id);
 						
-				// Change topic information
-				$("#"+data.commentID).children("div.comment_meta").children("small").html(
-				new Date(data.timestamp).toLocaleString());
-				$("#"+data.commentID).children("p").html(data.body);
+				// Change comment information
+				$("#"+data.commentID).find(".timeStamp").html(new Date(data.timestamp).toLocaleString());
+				$("#"+data.commentID).children("p").children("span").html(data.body);
 			}).fail(function() { alert("error"); });
   });
 });
