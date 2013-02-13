@@ -7,7 +7,6 @@ $(document).ready(function(){
 			url:"/topic/" + topId + "/comment/" + commId, 
 			type:"PUT",
 			success:function(result){
-				alert("upvoted!");
 				$("#"+commId).children(".comment_meta").children(".voteNum").html(result.commentUpvote);
 				$("#"+topId).find(".topic_votes").html("| " + result.topicUpvote + " Votes");
 			}

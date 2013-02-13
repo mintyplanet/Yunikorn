@@ -4,7 +4,6 @@ $(document).ready(function(){
 					title:$(".topic_title_form").val(),
 					link:$(".topic_link_form").val()
 				}, function(data, status) {
-					alert("success " + data.topicID);
 					
 					// Add a topic
 					$("#testTop").clone().attr({
@@ -15,6 +14,8 @@ $(document).ready(function(){
 					$("#"+data.topicID).children("div.topic_head").children("h3").children("a.topic_title").html(data.title);
 					
 					$("#"+data.topicID).children("div.topic_head").children("h3").children("span.topic_url").children("a").children("small").html(data.link);
+					
+					$("#"+data.topicID).find(".topic_url").children("a").attr("href", "http://" + data.link);
 				}).fail(function() { alert("error"); });
 	});
 });
