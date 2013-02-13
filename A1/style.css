@@ -47,3 +47,8 @@
 	text-decoration: none;
 	color: #000;
 }
+
+body{
+	left: 30px;
+	position: absolute;
+}
