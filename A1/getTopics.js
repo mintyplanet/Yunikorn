@@ -47,6 +47,10 @@ function commentDiv(comment){
 	cmnt.find('.timeStamp').html(new Date(comment.timestamp).toLocaleString());
 	cmnt.find("#bodyText").html(comment.body);
 	cmnt.children(".comment_meta").children(".voteNum").html(comment.upvote); // MUST keep this as children (can't use find) or it will screw up child comment votes
+	
+	// Sort nested comments
+	sortList(comment.comment);
+	
 	$.each(comment.comment, function(i, nested) {
 		cmnt.append(commentDiv(nested));
 		//commentDiv(nested).appendTo(cmnt);
@@ -60,6 +64,9 @@ function getComments(topId)
 {
 	$.getJSON("/topic/" + topId + "/comment", function(data, status) {
 		var topicComments = data["comments"];
+		
+		// Sort top-level comments
+		sortList(topicComments);
 		
 		//console.log(topicComments);
 		$.each(topicComments, function(i, comment){
