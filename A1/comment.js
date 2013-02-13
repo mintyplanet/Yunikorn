@@ -27,6 +27,7 @@ Comment.prototype = {
 	//increment the upvote by 1.
 	voteup: function(){
 		this.upvote++;
+		return this.upvote;
 	},
 
 	// return the timestamp
