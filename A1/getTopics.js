@@ -20,8 +20,11 @@ $(document).ready(function(){
 			style:"display: inline"}).appendTo("#copy-contain");
 			
 		// Change topic information
-		$("#"+sorted[i].topicID).children("div.topic_head").children("h3").children("a.topic_title").html(sorted[i].title);
-		$("#"+sorted[i].topicID).children("div.topic_head").children("h3").children("span.topic_url").children("a").children("small").html(sorted[i].link);
+		var topID = $("#"+sorted[i].topicID);
+		
+		topID.children("div.topic_head").children("h3").children("a.topic_title").html(sorted[i].title);
+		topID.children("div.topic_head").children("h3").children("span.topic_url").children("a").children("small").html(sorted[i].link);
+		topID.find(".topic_votes").html("| " + sorted[i].upvote + " Votes");
 	}
 	}).fail(function() { alert("error"); });
 });

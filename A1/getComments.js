@@ -5,6 +5,7 @@ function commentDiv(comment){
 		cmnt.attr({id:comment.commentID, style:"display: inline"});
 		cmnt.find('.timestamp').html(new Date(comment.timestamp).toLocaleString());
 		cmnt.find("#bodyText").html(comment.body);
+		cmnt.children(".comment_meta").children(".voteNum").html(comment.upvote); // MUST keep this as children (can't use find) or it will screw up child comment votes
 		$.each(comment.comment, function(i, nested) {
 			cmnt.append(commentDiv(nested));
 			//commentDiv(nested).appendTo(cmnt);

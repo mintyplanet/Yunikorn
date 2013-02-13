@@ -15,7 +15,7 @@ $(document).ready(function(){
 						
 				// Change topic information
 				$("#"+data.commentID).find(".timeStamp").html(new Date(data.timestamp).toLocaleString());
-				$("#"+data.commentID).children("p").html(data.body);
+				$("#"+data.commentID).find("#bodyText").html(data.body);
 			}).fail(function() { alert("error"); });
   });
 });
