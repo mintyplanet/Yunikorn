@@ -27,11 +27,14 @@ curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ty -d "body=I am Yuki"
 curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ty -d "body=I am Naomi"
 curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ty -d "body=We are Yunikorn"
 
-curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ty -d "body=Agree"
-curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ty -d "body=Disagree"
-curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ty -d "body=BOOOOOO"
-curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ty -d "body=Wheeeeee"
-curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ty -d "body=Lalalalala"
+curl ${SERVER}/topic/19xtf1ts/comment/19xtf1tz -d "body=Agree"
+curl ${SERVER}/topic/19xtf1ts/comment/19xtf1tz -d "body=Disagree"
+curl ${SERVER}/topic/19xtf1ts/comment/19xtf1tz -d "body=BOOOOOO"
+curl ${SERVER}/topic/19xtf1ts/comment/19xtf1tz -d "body=Wheeeeee"
+curl ${SERVER}/topic/19xtf1ts/comment/19xtf1tz -d "body=Lalalalala"
+
+curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ua -d "body=Cool!!!"
+
 
 #Upvote some comments
 curl ${SERVER}/topic/19xtf1ts/comment/19xtf1ua -X PUT
