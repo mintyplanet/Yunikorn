@@ -1,6 +1,6 @@
 // toggles display of the child reply_body div of a reply div
 $(document).on('click', '.reply', function () {
-	$(this).children('.reply_body').toggle();
+	$(this).next('.reply_body').toggle();
 });
 
 $(document).on('click', '.reply', function (event) {
