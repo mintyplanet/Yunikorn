@@ -8,8 +8,8 @@ $(document).ready(function(){
 			type:"PUT",
 			success:function(result){
 				alert("upvoted!");
-				$("#"+commId).find(".voteNum").html(result.upvote);
-				$("#"+topId).find(".topic_votes").html("| " + result.upvote + " Votes");
+				$("#"+commId).children(".comment_meta").children(".voteNum").html(result.commentUpvote);
+				$("#"+topId).find(".topic_votes").html("| " + result.topicUpvote + " Votes");
 			}
 		}).fail(function() { alert("error"); });
     });
