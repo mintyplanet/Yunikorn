@@ -187,7 +187,7 @@ function createTopicReply(response, args, topicID){
  * host-/topic/someid/comment/someid
  * method type: put
  * send: {}
- * receive: {}
+ * receive: {"upvote": int}
  */
 function voteup(response, topicID, commentID){
 	if (topicID in topicDB){
@@ -204,7 +204,7 @@ function voteup(response, topicID, commentID){
 	} else {
 		respondJSON(response, {err: "Comment not found"}, 404);
 	}
-	
+
 	//return the number of upvote in the topic.
 	var respond = {};
 	respond["upvote"] = upvote;
