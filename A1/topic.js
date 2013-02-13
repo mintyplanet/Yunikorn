@@ -6,6 +6,7 @@ function Topic(title, link) {
   this.comment = new Array();
   this.upvote = 0;
   this.timestamp = new Date();
+  this.numComments = 0;
 }
 
 Topic.prototype = {
@@ -38,6 +39,7 @@ Topic.prototype = {
 	//add commentID to the list of comments
 	addComment: function(commentID){
 		this.comment.push(commentID);
+		this.numComments++;
 	},
 
 	//increment the upvote of the topic by one
