@@ -4,7 +4,7 @@ function commentDiv(comment){
 		var cmnt = commentTemplate.clone();
 		cmnt.attr({id:comment.commentID, style:"display: inline"});
 		cmnt.find('.timestamp').html(new Date(comment.timestamp).toLocaleString());
-		cmnt.find(".comment_body").html(comment.body);
+		cmnt.find("#bodyText").html(comment.body);
 		$.each(comment.comment, function(i, nested) {
 			cmnt.append(commentDiv(nested));
 			//commentDiv(nested).appendTo(cmnt);
