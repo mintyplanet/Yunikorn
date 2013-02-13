@@ -1,3 +1,5 @@
+$(document).ready(function(){
+
 // toggles display of the child reply_body div of a reply div
 $(document).on('click', '.reply_button', function () {
 	$(this).next('.reply_body').toggle();
@@ -17,4 +19,9 @@ $(window).on('load', function () {
 			$(this).find('.num_comments').append(count + " Comments");
 		}
 	});
+});
+
+$(
+
+
 });
