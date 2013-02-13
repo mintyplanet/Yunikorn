@@ -138,7 +138,6 @@ function createTopic(response, args){
  * "timestamp": "time", "commentID": "someid"}
  */
 function createTopicReply(response, args, topicID){
-	
  	if (topicID in topicDB){
 		var body = args["body"],
  			id = getNextID(),
@@ -147,6 +146,7 @@ function createTopicReply(response, args, topicID){
 
  		// add commentID topic
  		topic.addComment(id);
+ 		topic.updateCommentNum();
  		commentDB[id] = comment;
  		comment["commentID"] = id;
  		respondJSON(response, comment, 201);
@@ -163,14 +163,16 @@ function createTopicReply(response, args, topicID){
  * receive: { "body": "somestring", "comment":["someid",...], "upvote":int, 
  * "timestampe": "time", "commentID": "someid"}
  */
- function createCommentReply(response, args, commentID){
- 	if (commentID in commentDB){
+ function createCommentReply(response, args, topicID, commentID){
+ 	if (commentID in commentDB && topicID in topicDB){
  		var body = args["body"],
  			id = getNextID(),
  			newcomment = new commentObj(body),
  			comment = commentDB[commentID];
+ 			topic = topicDB[topicID];
  		
  		// add comment into ParentComment
+ 		topic.updateCommentNum();
  		comment.addComment(id);
  		commentDB[id] = newcomment;
  		newcomment["commentID"] = id;
@@ -230,7 +232,7 @@ function serveFile(filePath, response) {
 	});
 }
 
-function handlePostRequest(request, response, callback, ID){
+function handlePostRequest(request, response, callback, topicID, commentID){
 	var postBody = '';
 	request.on('data', function(chunk) {
       	postBody += chunk.toString();
@@ -240,8 +242,10 @@ function handlePostRequest(request, response, callback, ID){
     request.on('end', function() {
     	if (callback == createTopic){
     		callback(response, querystring.parse(postBody));
+    	} else if (callback == createTopicReply){
+    		callback(response, querystring.parse(postBody), topicID);
     	} else {
-    		callback(response, querystring.parse(postBody), ID);
+    		callback(response, querystring.parse(postBody), topicID, commentID);
     	}
     });
 }
@@ -280,7 +284,7 @@ function serveREST(response, request, urlParts){
 		if (method == "PUT"){
 			voteup(response, topicID, commentID);
 		} else { //post
-			handlePostRequest(request, response, createCommentReply, commentID);
+			handlePostRequest(request, response, createCommentReply, topicID, commentID);
 		}
 		
 	} else {

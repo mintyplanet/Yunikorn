@@ -39,6 +39,9 @@ Topic.prototype = {
 	//add commentID to the list of comments
 	addComment: function(commentID){
 		this.comment.push(commentID);
+	},
+	
+	updateCommentNum: function(){
 		this.numComments++;
 	},
 
