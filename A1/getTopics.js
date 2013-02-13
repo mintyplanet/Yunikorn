@@ -9,7 +9,7 @@ $(document).ready(function(){
 						style:"display: inline"}).appendTo("#copy-contain");
 						
 					// Change topic information
-					$("#"+item.topicID).children("div.topic_head").children("h3").children("a").html(item.title);
+					$("#"+item.topicID).children("div.topic_head").children(".topic_title").children("a").html(item.title);
 					$("#"+item.topicID).children("div.topic_head").children("h3").children("span").children("a").children("small").html(item.link);
 				});
 			});
