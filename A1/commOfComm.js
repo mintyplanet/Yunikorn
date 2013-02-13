@@ -1,18 +1,17 @@
 $(document).ready(function(){
-  $(document).on ('click', 'button.btn.btn-small.com', function(){
-		
-		var id = $(this).closest('.topic').attr('id');
+  $(document).on ('click', 'button.btn.btn-small.comCom', function(){
+		var topId = $(this).closest('.topic').attr('id');
+		var commId = $(this).closest('.comment').attr('id');
 		var body = $(this).siblings('.reply_form').val();
 		
-		$.post("/topic/" + id + "/comment", {
-			topicID:id,
+		$.post("/topic/" + topId + "/comment/" + commId, {
 			body:body
 			}, function(data, status) {
 					
 				// Add a comment
 				$("#testCom").clone().attr({
 					id:data.commentID,
-					style:"display: inline"}).appendTo("#" + id);
+					style:"display: inline"}).appendTo("#" + commId);
 						
 				// Change topic information
 				$("#"+data.commentID).children("div.comment_meta").children("small").html(data.timestamp);
@@ -20,3 +19,4 @@ $(document).ready(function(){
 			}).fail(function() { alert("error"); });
   });
 });
+

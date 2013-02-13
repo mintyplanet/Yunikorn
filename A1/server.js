@@ -159,7 +159,7 @@ function createTopicReply(response, args, topicID){
  *create a comment to a comment:
  * host-/topic/someid/comment/someid
  * method type: post
- * send:{ "body": "somestring", "commentID": "someid"}
+ * send:{ "body": "somestring"}
  * receive: { "body": "somestring", "comment":["someid",...], "upvote":int, 
  * "timestampe": "time", "commentID": "someid"}
  */
