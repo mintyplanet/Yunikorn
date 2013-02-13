@@ -17,6 +17,7 @@ $(document).ready(function(){
 				$("#"+data.commentID).find(".timeStamp").html(new Date(data.timestamp).toLocaleString());
 				$("#"+data.commentID).find("#bodyText").html(data.body);
 			}).fail(function() { alert("error"); });
+		$(this).parent('.reply_body').toggle();
   });
 });
 
