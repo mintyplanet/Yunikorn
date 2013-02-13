@@ -187,27 +187,30 @@ function createTopicReply(response, args, topicID){
  * host-/topic/someid/comment/someid
  * method type: put
  * send: {}
- * receive: {"upvote": int}
+ * receive: {"topicUpvote": int, "commentUpvote": int}
  */
 function voteup(response, topicID, commentID){
+	var respond = {};
 	if (topicID in topicDB){
 		// update the vote in the topic
 		var topic = topicDB[topicID];
 		var upvote = topic.voteup();
+		respond["topicUpvote"] = upvote;
 	} else {
 		respondJSON(response, {err: "Topic not found"}, 404);
 	}
 
 	if (commentID in commentDB){
 		// update the vote in the comment
-		commentDB[commentID].voteup();
+		var comment = commentDB[commentID];
+		upvote = comment.voteup();
+		respond["commentUpvote"] = upvote;
 	} else {
 		respondJSON(response, {err: "Comment not found"}, 404);
 	}
 
 	//return the number of upvote in the topic.
-	var respond = {};
-	respond["upvote"] = upvote;
+	
 	respondJSON(response, respond, 202);
 }
 
