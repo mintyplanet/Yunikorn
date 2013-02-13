@@ -12,7 +12,8 @@ $(document).ready(function(){
 						style:"display: inline"}).appendTo("#copy-contain");
 						
 					// Change topic information
-					$("#"+data.topicID).children("div.topic_head").children("h3").children("a").html(data.title);
+					$("#"+data.topicID).children("div.topic_head").children("h3").children("a.topic_title").html(data.title);
+					$("#"data.topicID).children("div.topic_head").children("h3").children("span.topic_url").children("a").children("small").html(data.link);
 				}).fail(function() { alert("error"); });
 	});
 });
