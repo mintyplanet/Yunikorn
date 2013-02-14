@@ -101,7 +101,7 @@ function getCommentsOfComment(commentID){
 		var result = {};
 		result["comments"] = commentlist;
 		result["commentNum"] = topic.getCommentNum();
-		result["upvote"] = topic.getupvote();
+		result["upvote"] = topic.getUpvote();
 		respondJSON(response, result, 200);
 	} else {
 		respondJSON(response, {err: "Topic not found"}, 404);
