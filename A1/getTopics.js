@@ -26,6 +26,7 @@ $(document).ready(function(){
 			topID.children("div.topic_head").children("h3").children("span.topic_url").children("a").children("small").html(sorted[i].link);
 			topID.find(".topic_votes").html("| " + sorted[i].upvote + " Votes");
 			topID.find(".topic_url").children("a").attr("href", "http://" + sorted[i].link);
+			topID.find(".num_comments").html(sorted[i].numComments + " Comments");
 			// Get comments + hide for now
 			getComments(sorted[i].topicID);
 		}
