@@ -86,7 +86,7 @@ function getCommentsOfComment(commentID){
  * method type: get
  * send:{}
  * recieve:{"comments": [{"body":"somestring","upvote":int, 
- * "comment":[{"body":"somestring",...},... ], "timestamp": "time"},...], "commentNum":int} 
+ * "comment":[{"body":"somestring",...},... ], "timestamp": "time"},...], "commentNum":int, "upvote":int} 
  */
  function getComments(response, topicID){
 	if (topicID in topicDB){
@@ -101,6 +101,7 @@ function getCommentsOfComment(commentID){
 		var result = {};
 		result["comments"] = commentlist;
 		result["commentNum"] = topic.getCommentNum();
+		result["upvote"] = topic.getupvote();
 		respondJSON(response, result, 200);
 	} else {
 		respondJSON(response, {err: "Topic not found"}, 404);
