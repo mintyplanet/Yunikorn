@@ -85,6 +85,7 @@ $(document).ready(function(){
 					$("#"+topId).append(comments);
 				});
 			});
+			NoData = false;
 		}
 		shown = toggleComm($(this), shown);
 	});
