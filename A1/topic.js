@@ -49,6 +49,10 @@ Topic.prototype = {
 	voteup: function(){
 		this.upvote++;
 		return this.upvote;
+	},
+
+	getCommentNum: function(){
+		return this.numComments;
 	}
 }
 
