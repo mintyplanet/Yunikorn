@@ -1,9 +1,11 @@
 $(document).ready(function(){
+  // If click on the comment's "submit" button (first layer)
   $(document).on ('click', 'button.btn.btn-small.com', function(){
 		
 		var id = $(this).closest('.topic').attr('id');
 		var body = $(this).siblings('.reply_form').val();
 		
+		// Send post to the backend
 		$.post("/topic/" + id + "/comment", {
 			topicID:id,
 			body:body

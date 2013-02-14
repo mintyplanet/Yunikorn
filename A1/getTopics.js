@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	// Get topic information from backend
 	$.get("/topic", function(data, status) {
 	
 		var sorted = new Array();
@@ -22,6 +23,7 @@ $(document).ready(function(){
 			// Change topic information
 			var topID = $("#"+sorted[i].topicID);
 			
+			// Add information to topic
 			topID.children("div.topic_head").children("h3").children("a.topic_title").html(sorted[i].title);
 			topID.children("div.topic_head").children("h3").children("span.topic_url").children("a").children("small").html(sorted[i].link);
 			topID.find(".topic_votes").html("| " + sorted[i].upvote + " Votes");
@@ -31,6 +33,7 @@ $(document).ready(function(){
 	}).fail(function() { alert("error"); });
 });
 
+// Sorting for topics
 function sortList (list)
 {
 	list.sort(function(a,b)
