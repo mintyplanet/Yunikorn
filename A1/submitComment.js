@@ -17,6 +17,11 @@ $(document).ready(function(){
 				// Change comment information
 				$("#"+data.commentID).find(".timeStamp").html(new Date(data.timestamp).toLocaleString());
 				$("#"+data.commentID).find("#bodyText").html(data.body);
+				
+				// Increment comment number under post
+				var curr_comm = parseInt($("#"+id).find(".num_comments").text(), 10) + 1;
+				$("#"+id).find(".num_comments").html(curr_comm + " Comments");
+				
 			}).fail(function() { alert("error"); });
 		$(this).parent('.reply_body').toggle();
   });
