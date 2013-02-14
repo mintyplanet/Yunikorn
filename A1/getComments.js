@@ -4,6 +4,7 @@ $(document).ready(function(){
 	var shown = false;
 	var NoData = true;
 
+	// Hide the replies for topic
 	function toggleComm(topic, shown)
 	{
 		topic.siblings('.comment').toggle();
@@ -12,15 +13,17 @@ $(document).ready(function(){
 		return !shown;
 	}
 
-
+	// Helper function - adds comments (to be used in recursion)
 	function commentDiv(comment){
 		var cmnt = commentTemplate.clone();
 		cmnt.attr({id:comment.commentID, style:"display: inline"});
+		
 		// if the comment is already there do not proceed, else grab the comment.
 		if ($("#"+ comment.commentID + ".comment").length != 0){
 			return "";
 		}
 
+		// Assigning comment information
 		cmnt.find('.timeStamp').html(new Date(comment.timestamp).toLocaleString());
 		cmnt.find("#bodyText").html(comment.body);
 		cmnt.children(".comment_meta").children(".voteNum").html(comment.upvote); // MUST keep this as children (can't use find) or it will screw up child comment votes
@@ -28,11 +31,11 @@ $(document).ready(function(){
 		// Sort nested comments
 		sortList(comment.comment);
 	
+		// Append each comment into the html
 		$.each(comment.comment, function(i, nested) {
 			cmnt.append(commentDiv(nested));
-			//commentDiv(nested).appendTo(cmnt);
 		});
-		//console.log(cmnt.html());
+		
 		return cmnt;
 	}
 	
@@ -52,12 +55,9 @@ $(document).ready(function(){
 					// Sort nested comments
 					sortList(topicComments);
 	
-					//console.log(topicComments);	
+					// Append each comment
 					$.each(topicComments, function(i, comment){
-						//console.log(comment);
 						var comments = commentDiv(comment);
-						//console.log(topId);
-						//comments.appendTo("#" + topId);
 						$("#"+topId).append(comments);
 					});
 				});
@@ -79,12 +79,9 @@ $(document).ready(function(){
 				// Sort nested comments
 				sortList(topicComments);
 	
-				//console.log(topicComments);	
+				// Append each comment
 				$.each(topicComments, function(i, comment){
-					//console.log(comment);
 					var comments = commentDiv(comment);
-					//console.log(topId);
-					//comments.appendTo("#" + topId);
 					$("#"+topId).append(comments);
 				});
 			});
@@ -92,6 +89,7 @@ $(document).ready(function(){
 		shown = toggleComm($(this), shown);
 	});
 	
+	// Sorting for comments
 	function sortList (list)
 	{
 		list.sort(function(a,b)

@@ -5,11 +5,13 @@ $(document).ready(function(){
 		$(this).next('.reply_body').toggle();
 	});
 
+	// When inputting into the textbox, this stops it from hiding again
 	$(document).on('click', '.reply', function (event) {
 		event.stopPropagation();
 	});
 
-	// get number of comments in a thread
+	// Not needed because don't have comment number
+	/* // get number of comments in a thread
 	$(window).on('load', function () {
 		$('.topic').each(function (i) {
 			var count = $(this).find('.comment').length;
@@ -19,5 +21,5 @@ $(document).ready(function(){
 				$(this).find('.num_comments').append(count + " Comments");
 			}
 		});
-	});
+	}); */
 });
