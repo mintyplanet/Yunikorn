@@ -21,9 +21,13 @@ $(document).ready(function(){
 			return "";
 		}
 
-		cmnt.find('.timestamp').html(new Date(comment.timestamp).toLocaleString());
+		cmnt.find('.timeStamp').html(new Date(comment.timestamp).toLocaleString());
 		cmnt.find("#bodyText").html(comment.body);
 		cmnt.children(".comment_meta").children(".voteNum").html(comment.upvote); // MUST keep this as children (can't use find) or it will screw up child comment votes
+		
+		// Sort nested comments
+		sortList(comment.comment);
+	
 		$.each(comment.comment, function(i, nested) {
 			cmnt.append(commentDiv(nested));
 			//commentDiv(nested).appendTo(cmnt);
@@ -45,6 +49,9 @@ $(document).ready(function(){
 				$.getJSON("/topic/" + topId + "/comment", function(data, status) {
 					var topicComments = data["comments"];
 
+					// Sort nested comments
+					sortList(topicComments);
+	
 					//console.log(topicComments);	
 					$.each(topicComments, function(i, comment){
 						//console.log(comment);
@@ -69,6 +76,9 @@ $(document).ready(function(){
 			$.getJSON("/topic/" + topId + "/comment", function(data, status) {
 				var topicComments = data["comments"];
 
+				// Sort nested comments
+				sortList(topicComments);
+	
 				//console.log(topicComments);	
 				$.each(topicComments, function(i, comment){
 					//console.log(comment);
@@ -81,4 +91,14 @@ $(document).ready(function(){
 		}
 		shown = toggleComm($(this), shown);
 	});
+	
+	function sortList (list)
+	{
+		list.sort(function(a,b)
+		{
+			return parseInt(b.upvote) - parseInt(a.upvote);
+		});
+	}
+
 });
+
