@@ -2,6 +2,7 @@ $(document).ready(function(){
 	
 	var commentTemplate = $('#testCom');
 	var shown = false;
+	var NoData = true;
 
 	function toggleComm(topic, shown)
 	{
@@ -37,6 +38,24 @@ $(document).ready(function(){
 		
 		if (!shown)
 		{
+			//grab data for the first time.
+			if (NoData){
+				var topId = $(this).closest('.topic').attr('id');
+				// Get top level comments
+				$.getJSON("/topic/" + topId + "/comment", function(data, status) {
+					var topicComments = data["comments"];
+
+					//console.log(topicComments);	
+					$.each(topicComments, function(i, comment){
+						//console.log(comment);
+						var comments = commentDiv(comment);
+						//console.log(topId);
+						//comments.appendTo("#" + topId);
+						$("#"+topId).append(comments);
+					});
+				});
+				NoData = false;
+			}
 			shown = toggleComm(top, shown);
 		}
 	});
