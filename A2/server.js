@@ -1,22 +1,27 @@
 var express = require('express'),
-	app = express();
+	tumblrAPI = require('./tumblr'),
+	app = express(),
+	tumblr = tumblrAPI('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69');
 
+/* 
+ * OAuth Consumer Key: EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69
+ */
 var PORT = 31335; //Yuki's assigned port
- 
+
 // Simple logging middleware for development
 app.use(express.logger('dev'));
 
 
 /* Routes */
 app.post('/blog', function(req, res){
-	res.json();
+	res.json(tumblr);
 });
-app.get('/blog/:base_hostname/trends', function(req, res) {
+app.get('/blog/:blogname/trends', function(req, res) {
 	var order = req.query.order,
 		limit = req.query.limit,
-		hostname = req.params.base_hostname;
+		blogname = req.params.blogname;
 		
-	res.json({"trending": [{"not-a-real-field":hostname}], "order": order, "limit": limit});
+	res.json({"trending": [{"not-a-real-field":blogname}], "order": order, "limit": limit});
 });
 app.get('/blogs/trends', function(req, res) {
 	var order = req.query.order,
