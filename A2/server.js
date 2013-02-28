@@ -4,35 +4,67 @@ var express = require('express'),
 	app = express(),
 	tumblr = new Tumblr('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69');
 
-//sqlite3 database
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(':memory:');
-
 /* 
  * OAuth Consumer Key: EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69
  */
 var PORT = 31335; //Yuki's assigned port
 
-//store liked post of blog into database
+//sqlite3 database
+var sqlite3 = require('sqlite3').verbose();
+//database is in memory for now for developing purpose
+var db = new sqlite3.Database(':memory:');
+
+/* creat tables with the following schema:
+ * post(postID(Key), url, text, image, date)
+ * tracking(hostName(Key), postid(Key/Foreign Key), Sequence(Key), count)
+ */
+db.serialize(function(){
+	db.run("CREATE TABLE IF NOT EXISTS post(postID int NOT NULL, url varchar(255) NOT NULL,\
+	 text varchar(255), image varchar(255), date varchar(20) NOT NULL, PRIMARY KEY (postID))", 
+		function(err, row) { (err)? console.log(err) : console.log("created table post");});
+
+	db.run("CREATE TABLE IF NOT EXISTS tracking(hostName varchar(255) NOT NULL, postID int \
+		NOT NULL, sequence int NOT NULL, count int NOT NULL, \
+		PRIMARY KEY(hostName, postID, sequence), FOREIGN KEY (postID) REFERENCES post(postID))",
+		function(err, row) { (err)? console.log(err) : console.log("created table tracking");});
+});
+
+/* store liked post of blog into database
+ * host - /blog
+ * method type: Post
+ * sends: blog
+ * receive : {"status": 200, "msg":"ok"} 
+ */
 function storeBlog(req, res){
-	//TODO: Get the base hostname as a parameter. Save it in the db for tracking.
 	var baseHostName = req.params.blog,
 		tumReq = tumblr.liked(baseHostName);
 
-	req.on('done', function(data){
+	tumReq.on('done', function(data){
 		console.log(data.length);
 		//parse thru the returned data and store into database
+		for (var i = 0; i < data.length; i++){
+			db.parallelize(function(){
+				db.run("INSERT INTO post VALUES ");
+				db.run("INSERT INTO tracking VALUES ");
+			})
+		}
 
 	});
-	req.on('error', function(e) {
+	tumReq.on('error', function(e) {
 		// Invoked if JSONP response was non-200
 		console.log(e);
+		res.json({"status":404, "msg": "tumblr did not repond"})
 	});
 
 	res.json({"status": 200,"msg": "OK"});
 }
 
-//return the json of trends tracked by blog
+/*return the json of trends tracked by blog
+ * host - /blog/{base-hostname}/trends
+ * method type: get
+ * sends: {limit:(optional), order:"Trending"| "Recent"}
+ * receive: see csc309 webpage
+ */
 function getBlogTrends(req, res){
 	//TODO: Well, basically everything
 	
@@ -44,8 +76,13 @@ function getBlogTrends(req, res){
 	res.json({"trending": [{"not-a-real-field":blogname}], "order": order, "limit": limit});
 }
 
-//return the json of trends tracked by every blog.
-function getTrends(){
+/*return the json of trends tracked by every blog.
+ * host - /blog/trends
+ * method type: get
+ * sends: {limit:(optional), order:"Trending"| "Recent"}
+ * receive: see csc309 webpage
+ */
+function getTrends(req, res){
 	//TODO: Well, basically everything.
 	var order = req.query.order,
 		limit = req.query.limit;
@@ -54,7 +91,7 @@ function getTrends(){
 }
 
 //update blog with new counts from tumblr API
-function updateBlog(){
+function updateBlog(req, res){
 	//TODO: everything.
 }
 
@@ -62,9 +99,9 @@ function updateBlog(){
 app.use(express.logger('dev'));
 
 /* Routes */
-app.post('/blog', storeBlog(req, res));
-app.get('/blog/:blogname/trends', getBlogTrends(req, res));
-app.get('/blogs/trends', getTrends(req, res));
+app.post('/blog', storeBlog);
+app.get('/blog/:blogname/trends', getBlogTrends);
+app.get('/blogs/trends', getTrends);
 
 setInterval(function(){
 	util.log('This is scheduled to run every 5 seconds');
