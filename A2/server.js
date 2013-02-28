@@ -16,7 +16,7 @@ var db = new sqlite3.Database(':memory:');
 
 /* creat tables with the following schema:
  * post(postID(Key), url, text, image, date)
- * tracking(hostName(Key), postid(Key/Foreign Key), Sequence(Key), count)
+ * tracking(hostName(Key), postid(Key & Foreign Key), Sequence(Key), count)
  */
 db.serialize(function(){
 	db.run("CREATE TABLE IF NOT EXISTS post(postID int NOT NULL, url varchar(255) NOT NULL,\
@@ -36,27 +36,48 @@ db.serialize(function(){
  * receive : {"status": 200, "msg":"ok"} 
  */
 function storeBlog(req, res){
-	var baseHostName = req.params.blog,
-		tumReq = tumblr.liked(baseHostName);
+	//TODO need to check if blog is already being tracked
+	var baseHostName = req.params.blog;
+
+	//call helper function in tumblr.js to talk to tumblr API and get the data
+	var tumReq = tumblr.liked(baseHostName);
 
 	tumReq.on('done', function(data){
 		console.log(data.length);
 		//parse thru the returned data and store into database
 		for (var i = 0; i < data.length; i++){
-			db.parallelize(function(){
-				db.run("INSERT INTO post VALUES ");
-				db.run("INSERT INTO tracking VALUES ");
-			})
-		}
+			var currentPost= data[i],
+				postID = currentPost["id"],
+				url = currentPost["post_url"],
+				text = currentPost["text"],
+				image = currentPost["image_permalink"],
+				date = currentPost["date"],
+				count = currentPost["note_count"];
 
+			//insert all post into the database for the first time
+			db.parallelize(function(){
+				db.run("INSERT INTO post VALUES (?,?,?,?,?)", [postID, url, text, image, date], 
+					function(err, row) { (err)? 
+						console.log(err) : console.log("inserted " + postID + "into post");});
+				db.run("INSERT INTO tracking VALUES (?,?,?,?)", [baseHostName, postID, 1, count],
+					function(err, row) { (err)? 
+						console.log(err) : console.log("inserted " + postID + "into tracking");});
+			});
+		}
+		
+		//set the blog to be updated in an hour
+		setInterval(function(){
+			updateBlog(hostName);
+			util.log(hostName + " updated"); 
+			}, 1000*60*60 );
+		res.json({"status": 200,"msg": "OK"});
 	});
+
 	tumReq.on('error', function(e) {
 		// Invoked if JSONP response was non-200
 		console.log(e);
 		res.json({"status":404, "msg": "tumblr did not repond"})
 	});
-
-	res.json({"status": 200,"msg": "OK"});
 }
 
 /*return the json of trends tracked by blog
@@ -91,7 +112,7 @@ function getTrends(req, res){
 }
 
 //update blog with new counts from tumblr API
-function updateBlog(req, res){
+function updateBlog(blogName){
 	//TODO: everything.
 }
 
