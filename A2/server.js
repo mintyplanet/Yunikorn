@@ -16,16 +16,16 @@ var PORT = 31335; //Yuki's assigned port
  */
 function storeBlog(req, res, args){
 	var baseHostName = args["blog"];
-	console.log( baseHostName);
+	console.log( blogname);
 	//checking to see if the blog is already being tracked
-	sql.checkBlog(baseHostName, function(queryResult){
+	sql.checkBlog(blogname, function(queryResult){
 		if(queryResult != null){
 			res.json({"status": 409,"msg": "Blog is already tracked"});
 		}
 	});
 
 	//call helper function in tumblr.js to talk to tumblr API and get the data
-	var tumReq = tumblr.liked(baseHostName, function(data){
+	var tumReq = tumblr.liked(blogname, function(data){
 		//parse thru the returned data and store into database
 		for (var i = 0; i < data.length; i++){
 			var currentPost= data[i],
@@ -37,13 +37,13 @@ function storeBlog(req, res, args){
 				count = currentPost["note_count"];
 
 			//insert all post into the database for the first time
-			sql.insertGetBlog(postID, url, text, image, date, baseHostName, 1, count);
+			sql.insertGetBlog(postID, url, text, image, date, blogname, 1, count);
 		}
 		sql.showTables();
 		//set the blog to be updated in an hour
 		setInterval(function(){
-			updateBlog(baseHostName);
-			util.log(baseHostName + " updated"); 
+			updateBlog(blogname);
+			util.log(blogname + " updated"); 
 			}, 1000*10 );
 		res.json({"status": 200,"msg": "OK"});
 	});
