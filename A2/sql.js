@@ -5,15 +5,15 @@ var db = new sqlite3.Database(':memory:');
 
 /* creat tables with the following schema:
  * post(postID(Key), url, text, image, date)
- * tracking(hostName(Key), postid(Key & Foreign Key), Sequence(Key), count, time)
+ * tracking(hostName(Key), postid(Key), Sequence(Key), count, time)
  */
 db.run("CREATE TABLE IF NOT EXISTS post(postID int NOT NULL, url varchar(255) NOT NULL,\
-	 text varchar(255), image varchar(255), date varchar(20) NOT NULL, PRIMARY KEY (postID))", 
+	 text TEXT, image varchar(255), date varchar(20) NOT NULL, PRIMARY KEY (postID))", 
 	function(err, row) { (err)? console.log(err) : console.log("created table post");});
 
 db.run("CREATE TABLE IF NOT EXISTS tracking(hostName varchar(255) NOT NULL, postID int \
-	NOT NULL, sequence int NOT NULL, count int NOT NULL, time varchar(20), \
-	PRIMARY KEY(hostName, postID, sequence), FOREIGN KEY (postID) REFERENCES post(postID))",
+	NOT NULL, sequence int NOT NULL, count int NOT NULL, time varchar(20) NOT NULL, \
+	PRIMARY KEY(hostName, postID, sequence))",
 	function(err, row) { (err)? console.log(err) : console.log("created table tracking");});
 
 /*
@@ -25,7 +25,7 @@ exports.insertGetBlog = function(postID, url, text, image, date, baseHostName, s
 			function(err, row) { (err)? 
 			console.log(err) : console.log("inserted " + postID + " into post");});
 
-		db.run("INSERT INTO tracking VALUES (?,?,?,?)", [baseHostName, postID, sequence, count, date],
+		db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [baseHostName, postID, sequence, count, date],
 			function(err, row) { (err)? 
 			console.log(err) : console.log("inserted " + postID + " into tracking");});
 	});
@@ -34,12 +34,10 @@ exports.insertGetBlog = function(postID, url, text, image, date, baseHostName, s
 /* 
  * check if the blog is already being tracked. Return true if it is, otherwise return false.
  */
-exports.checkBlog = function(blogName){
-	var exist;
+exports.checkBlog = function(blogName, callback){
 	db.get("SELECT hostName FROM tracking WHERE hostName = ?", blogName, 
 		function(err, row) { (err)? console.log(err) : console.log("CheckBlog sucessful");
-			(row)? exist = true : exist = false;});
-	return exist;
+			callback(row);});
 }
 
 exports.showTables = function(){
@@ -56,4 +54,19 @@ exports.showTables = function(){
 				console.log(row);
 		});
 	});
+}
+
+exports.getPost = function(postID, callback){
+	db.get("SELECT * FROM tracking WHERE postID = ? \
+		AND sequence = (SELECT MAX(sequence) FROM tracking WHERE postID = ?)", [postID, postID],
+		function(err, row){ (err)? console.log(err) : console.log("get post successful");
+			callback(row);
+	});
+}
+
+exports.insertNewTrack = function(postID, date, baseHostName, sequence, count){
+	db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [baseHostName, postID, sequence, count, date],
+			function(err, row) { (err)? 
+			console.log(err) : console.log("inserted " + postID + " into tracking");}
+			);
 }
