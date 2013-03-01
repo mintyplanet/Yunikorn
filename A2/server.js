@@ -2,6 +2,7 @@ var express = require('express'),
 	Tumblr = require('./tumblr'),
 	util = require('util'),
 	sql = require('./sql'),
+	querystring = require('querystring'),
 	app = express(),
 	tumblr = new Tumblr('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69');
 
@@ -16,14 +17,14 @@ var PORT = 31335; //Yuki's assigned port
  * sends: blog
  * receive : {"status": 200, "msg":"ok"} 
  */
-function storeBlog(req, res){
-	var baseHostName = req.params.blog;
-
+function storeBlog(req, res, args){
+	var baseHostName = args["blog"];
+	console.log( baseHostName);
 	//checking to see if the blog is already being tracked
 	if(sql.checkBlog(baseHostName)){
 		res.json({"status": 409,"msg": "Blog is already tracked"});
 	}
-	
+
 	//call helper function in tumblr.js to talk to tumblr API and get the data
 	var tumReq = tumblr.liked(baseHostName);
 
@@ -40,9 +41,9 @@ function storeBlog(req, res){
 				count = currentPost["note_count"];
 
 			//insert all post into the database for the first time
-			sql.insertGetBlog(postID, url, text, image, date, baseHostName, postID, 1, count);
+			sql.insertGetBlog(postID, url, text, image, date, baseHostName, 1, count);
 		}
-		
+		sql.showTables();
 		//set the blog to be updated in an hour
 		setInterval(function(){
 			updateBlog(baseHostName);
@@ -54,7 +55,7 @@ function storeBlog(req, res){
 	tumReq.on('error', function(e) {
 		// Invoked if JSONP response was non-200
 		console.log(e);
-		res.json({"status":404, "msg": "tumblr did not repond"})
+		res.json({"status":404, "msg": "host name not found"});
 	});
 }
 
@@ -94,17 +95,26 @@ function updateBlog(blogName){
 	//TODO: everything.
 }
 
+// extract the data for the post request on path /blog
+function handleBlogPost(req, res){
+	var postBody = '';
+	req.on('data', function(chunk) {
+      	postBody += chunk.toString();
+    });
+    
+    //extract the post data, and send the data to the right function
+    req.on('end', function() {
+    	storeBlog(req, res, querystring.parse(postBody));
+    });
+}
+
 // Simple logging middleware development
 app.use(express.logger('dev'));
 
 /* Routes */
-app.post('/blog', storeBlog);
+app.post('/blog', handleBlogPost);
 app.get('/blog/:blogname/trends', getBlogTrends);
 app.get('/blogs/trends', getTrends);
-
-setInterval(function(){
-	util.log('This is scheduled to run every 5 seconds');
-}, 1000*5 );
 
 setInterval(function(){
 	util.log('And this one, every hour. Maybe we can use this to schedule the hourly tracking');
