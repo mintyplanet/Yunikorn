@@ -1,6 +1,7 @@
 var express = require('express'),
 	Tumblr = require('./tumblr'),
 	util = require('util'),
+	sql = require('./sql'),
 	app = express(),
 	tumblr = new Tumblr('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69');
 
@@ -9,26 +10,6 @@ var express = require('express'),
  */
 var PORT = 31335; //Yuki's assigned port
 
-//sqlite3 database
-var sqlite3 = require('sqlite3').verbose();
-//database is in memory for now for developing purpose
-var db = new sqlite3.Database(':memory:');
-
-/* creat tables with the following schema:
- * post(postID(Key), url, text, image, date)
- * tracking(hostName(Key), postid(Key & Foreign Key), Sequence(Key), count)
- */
-db.serialize(function(){
-	db.run("CREATE TABLE IF NOT EXISTS post(postID int NOT NULL, url varchar(255) NOT NULL,\
-	 text varchar(255), image varchar(255), date varchar(20) NOT NULL, PRIMARY KEY (postID))", 
-		function(err, row) { (err)? console.log(err) : console.log("created table post");});
-
-	db.run("CREATE TABLE IF NOT EXISTS tracking(hostName varchar(255) NOT NULL, postID int \
-		NOT NULL, sequence int NOT NULL, count int NOT NULL, \
-		PRIMARY KEY(hostName, postID, sequence), FOREIGN KEY (postID) REFERENCES post(postID))",
-		function(err, row) { (err)? console.log(err) : console.log("created table tracking");});
-});
-
 /* store liked post of blog into database
  * host - /blog
  * method type: Post
@@ -36,9 +17,13 @@ db.serialize(function(){
  * receive : {"status": 200, "msg":"ok"} 
  */
 function storeBlog(req, res){
-	//TODO need to check if blog is already being tracked
 	var baseHostName = req.params.blog;
 
+	//checking to see if the blog is already being tracked
+	if(sql.checkBlog(baseHostName)){
+		res.json({"status": 409,"msg": "Blog is already tracked"});
+	}
+	
 	//call helper function in tumblr.js to talk to tumblr API and get the data
 	var tumReq = tumblr.liked(baseHostName);
 
@@ -55,19 +40,12 @@ function storeBlog(req, res){
 				count = currentPost["note_count"];
 
 			//insert all post into the database for the first time
-			db.parallelize(function(){
-				db.run("INSERT INTO post VALUES (?,?,?,?,?)", [postID, url, text, image, date], 
-					function(err, row) { (err)? 
-						console.log(err) : console.log("inserted " + postID + "into post");});
-				db.run("INSERT INTO tracking VALUES (?,?,?,?)", [baseHostName, postID, 1, count],
-					function(err, row) { (err)? 
-						console.log(err) : console.log("inserted " + postID + "into tracking");});
-			});
+			sql.insertGetBlog(postID, url, text, image, date, baseHostName, postID, 1, count);
 		}
 		
 		//set the blog to be updated in an hour
 		setInterval(function(){
-			updateBlog(hostName);
+			updateBlog(baseHostName);
 			util.log(hostName + " updated"); 
 			}, 1000*60*60 );
 		res.json({"status": 200,"msg": "OK"});
