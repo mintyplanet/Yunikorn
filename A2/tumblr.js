@@ -32,7 +32,7 @@ var Tumblr = function(apikey) {
             
 			var posts = data.response.liked_posts,
 				count = data.response.liked_count;
-			util.log(util.format("fetched %d posts (of %d total)", posts.length, count));
+			util.log(util.format("fetched %d (%d total) liked posts of %s", posts.length, count, blogname));
 			callback(posts);
 		});
 		return emitter;

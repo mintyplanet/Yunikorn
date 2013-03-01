@@ -7,6 +7,7 @@ var express = require('express'),
 	tumblr = new Tumblr('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69'); //OAuth Consumer Key
 
 var PORT = 31335; //Yuki's assigned port
+var HOUR = 1000*10; // in milliseconds.	Currently set to 10 seconds for productive debugging...
 
 /* store liked post of blog into database
  * host - /blog
@@ -15,43 +16,23 @@ var PORT = 31335; //Yuki's assigned port
  * receive : {"status": 200, "msg":"ok"} 
  */
 function storeBlog(req, res, args){
-	var baseHostName = args["blog"];
-	console.log( blogname);
+	var blogname = args["blog"];
+	
 	//checking to see if the blog is already being tracked
-	sql.checkBlog(blogname, function(queryResult){
-		if(queryResult != null){
-			res.json({"status": 409,"msg": "Blog is already tracked"});
+	sql.BlogIsTracked(blogname, function(queryResult){
+		if(!queryResult){
+			updateBlog(blogname, function(err){
+				if (err) {	// JSONP response was non-200
+					res.json(err.status, err);
+				} else {
+					res.json({"status": 200,"msg": "OK"});
+					// Schedule the blog to run every hour
+					setInterval(updateBlog, HOUR, blogname); //setInterval(callback, delay, [arg], [...])
+				}
+			});
+		} else {
+			res.json(409, {"status": 409,"msg": "Blog is already tracked"});
 		}
-	});
-
-	//call helper function in tumblr.js to talk to tumblr API and get the data
-	var tumReq = tumblr.liked(blogname, function(data){
-		//parse thru the returned data and store into database
-		for (var i = 0; i < data.length; i++){
-			var currentPost= data[i],
-				postID = currentPost["id"],
-				url = currentPost["post_url"],
-				text = currentPost["text"],
-				image = currentPost["image_permalink"],
-				date = currentPost["date"],
-				count = currentPost["note_count"];
-
-			//insert all post into the database for the first time
-			sql.insertGetBlog(postID, url, text, image, date, blogname, 1, count);
-		}
-		sql.showTables();
-		//set the blog to be updated in an hour
-		setInterval(function(){
-			updateBlog(blogname);
-			util.log(blogname + " updated"); 
-			}, 1000*10 );
-		res.json({"status": 200,"msg": "OK"});
-	});
-
-	tumReq.on('error', function(e) {
-		// Invoked if JSONP response was non-200
-		console.log(e);
-		res.json({"status":404, "msg": "host name not found"});
 	});
 }
 
@@ -87,8 +68,12 @@ function getTrends(req, res){
 }
 
 //update blog with new counts from tumblr API
-function updateBlog(blogName){
-	var tumReq = tumblr.liked(blogName, function(data){
+function updateBlog(blogname, callback){
+	callback = callback ? callback : function(){};
+	
+	var tumReq = tumblr.liked(blogname, function(data){
+		// fetching the liked posts was successful. ok to use callback now.
+		callback();
 		//parse thru the returned data and store into database
 		data.forEach(function(post){
 			var postID = post.id,
@@ -97,28 +82,21 @@ function updateBlog(blogName){
 				date = post.date,
 				image = post.image_permalink,
 				count = post.note_count;
-			sql.getPost(postID, function(queryResult) {
+			sql.getLatestPostStats(postID, function(queryResult) {
 				if (queryResult){ //this post is already being tracked
 					var sequence = queryResult["sequence"] + 1;
-					sql.insertNewTrack(postID, Date(), blogName, sequence, count);
+					sql.createPostStat(postID, Date(), blogname, sequence, count);
 				} else {
-					//insert new post into the database
-					sql.insertGetBlog(postID, url, text, image, date, blogName, 1, count);
+					//insert new blog info into the database
+					sql.registerBlog(postID, url, text, image, date, blogname, count);
 				}
 			});
 		});
 	});
 
 	tumReq.on('error', function(e) {
-		// return error message to the log.
-		console.log(e);
+		callback(e);
 	});
-
-	//set timer to call update blog in one hour
-	setInterval(function(){
-		updateBlog(blogName);
-		util.log(blogName + " updated"); 
-		}, 1000*60*60 );
 }
 
 // extract the data for the post request on path /blog
