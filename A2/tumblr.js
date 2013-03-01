@@ -18,48 +18,25 @@ function JSONrequest(url, callback) {
 /* Tumblr API. Only capable of fetching liked posts */
 // See testtumblr.js for usage example
 var Tumblr = function(apikey) {
-	var apikey = apikey;
+	var apikey = apikey,
+		emitter = new EventEmitter;
 	
-	this.liked = function(blogname){
-		var url = util.format("http://api.tumblr.com/v2/blog/%s/likes?api_key=%s&offset=%d", blogname, apikey);
-		
-		this.emit('fetchliked', url, 0, []);
-		return this;
-	};
-	
-	var _fetchliked = function(url, offset, accPosts){
-		var self = this,
-			urlOffsetted = util.format(url, offset);
-		JSONrequest(urlOffsetted, function(data){
+	this.liked = function(blogname, callback){
+		var url = util.format("http://api.tumblr.com/v2/blog/%s/likes?api_key=%s", blogname, apikey);
+		JSONrequest(url, function(data) {
 			// This takes care of JSONP status check
 			if (data.meta.status != 200) {
-				self.emit('error', data.meta);
+				emitter.emit('error', data.meta);
 				return;
 			}
-			
+            
 			var posts = data.response.liked_posts,
 				count = data.response.liked_count;
-			
-			console.log("Currently at "+offset+"/"+count);
-			accPosts.push(posts);
-			/* Need this logic, because the (real) tumblr API will only
-			 * fetch 20 topics at most in one call.
-			 */
-			if (offset < count){
-				self.emit('fetchliked', url, offset+posts.length, accPosts);
-			} else {
-				var allPosts = [].concat.apply([], accPosts);
-				// Just making sure we have the right number of posts
-				console.log("count: "+count);
-				console.log("all posts: "+allPosts.length);
-				self.emit('done', allPosts);
-			}
+			console.log(util.format("fetched %d posts", posts.length));
+			callback(posts);
 		});
+		return emitter;
 	};
-	
-	this.on('fetchliked', _fetchliked);
 }
 
-// Tumblr class inherits emit and on methods from EventEmitter
-util.inherits(Tumblr, EventEmitter);
 module.exports = Tumblr;
