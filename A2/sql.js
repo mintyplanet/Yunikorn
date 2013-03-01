@@ -59,9 +59,15 @@ exports.showTables = function(){
 exports.getPost = function(postID, callback){
 	db.get("SELECT * FROM tracking WHERE postID = ? \
 		AND sequence = (SELECT MAX(sequence) FROM tracking WHERE postID = ?)", [postID, postID],
-		function(err, row){ (err)? console.log(err) : console.log("get post successful");
-			callback(row);
-	});
+		function(err, row){
+			if (err){
+				console.log(err)
+			} else {
+				console.log("get post successful");
+				callback(row);
+			}
+		}
+	);
 }
 
 exports.insertNewTrack = function(postID, date, baseHostName, sequence, count){

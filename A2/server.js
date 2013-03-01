@@ -4,11 +4,8 @@ var express = require('express'),
 	sql = require('./sql'),
 	querystring = require('querystring'),
 	app = express(),
-	tumblr = new Tumblr('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69');
+	tumblr = new Tumblr('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69'); //OAuth Consumer Key
 
-/* 
- * OAuth Consumer Key: EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69
- */
 var PORT = 31335; //Yuki's assigned port
 
 /* store liked post of blog into database
@@ -93,27 +90,23 @@ function getTrends(req, res){
 function updateBlog(blogName){
 	var tumReq = tumblr.liked(blogName, function(data){
 		//parse thru the returned data and store into database
-		for (var i = 0; i < data.length; i++){
-			var currentPost= data[i],
-				postID = currentPost["id"],
-				url = currentPost["post_url"],
-				text = currentPost["text"],
-				image = currentPost["image_permalink"],
-				date = currentPost["date"],
-				count = currentPost["note_count"];
-
-			sql.getPost(postID, function(queryResult){
-				if (queryResult){
+		data.forEach(function(post){
+			var postID = post.id,
+				url = post.post_url,
+				text = post.text,
+				date = post.date,
+				image = post.image_permalink,
+				count = post.note_count;
+			sql.getPost(postID, function(queryResult) {
+				if (queryResult){ //this post is already being tracked
 					var sequence = queryResult["sequence"] + 1;
-					console.log(currentPost);
-					sql.insertNewTrack(postID, date, blogName, sequence, count);
+					sql.insertNewTrack(postID, Date(), blogName, sequence, count);
 				} else {
 					//insert new post into the database
 					sql.insertGetBlog(postID, url, text, image, date, blogName, 1, count);
 				}
 			});
-		}
-
+		});
 	});
 
 	tumReq.on('error', function(e) {
@@ -149,10 +142,7 @@ app.post('/blog', handleBlogPost);
 app.get('/blog/:blogname/trends', getBlogTrends);
 app.get('/blogs/trends', getTrends);
 
-setInterval(function(){
-	util.log('And this one, every hour. Maybe we can use this to schedule the hourly tracking');
-}, 1000*60*60 );
 
-/* Sit back and listen to port */
+/* Sit back, and listen to the beautiful sound of port */
 app.listen(PORT);
 console.log("Express server listening on http://127.0.0.1:"+PORT);

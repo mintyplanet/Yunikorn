@@ -18,10 +18,10 @@ function JSONrequest(url, callback) {
 /* Tumblr API. Only capable of fetching liked posts */
 // See testtumblr.js for usage example
 var Tumblr = function(apikey) {
-	var apikey = apikey,
-		emitter = new EventEmitter;
+	var apikey = apikey;
 	
 	this.liked = function(blogname, callback){
+		var emitter = new EventEmitter;
 		var url = util.format("http://api.tumblr.com/v2/blog/%s/likes?api_key=%s", blogname, apikey);
 		JSONrequest(url, function(data) {
 			// This takes care of JSONP status check
@@ -32,7 +32,7 @@ var Tumblr = function(apikey) {
             
 			var posts = data.response.liked_posts,
 				count = data.response.liked_count;
-			console.log(util.format("fetched %d posts", posts.length));
+			util.log(util.format("fetched %d posts (of %d total)", posts.length, count));
 			callback(posts);
 		});
 		return emitter;
