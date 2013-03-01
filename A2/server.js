@@ -21,15 +21,14 @@ function storeBlog(req, res, args){
 	var baseHostName = args["blog"];
 	console.log( baseHostName);
 	//checking to see if the blog is already being tracked
-	if(sql.checkBlog(baseHostName)){
-		res.json({"status": 409,"msg": "Blog is already tracked"});
-	}
+	sql.checkBlog(baseHostName, function(queryResult){
+		if(queryResult != null){
+			res.json({"status": 409,"msg": "Blog is already tracked"});
+		}
+	});
 
 	//call helper function in tumblr.js to talk to tumblr API and get the data
-	var tumReq = tumblr.liked(baseHostName);
-
-	tumReq.on('done', function(data){
-		console.log(data.length);
+	var tumReq = tumblr.liked(baseHostName, function(data){
 		//parse thru the returned data and store into database
 		for (var i = 0; i < data.length; i++){
 			var currentPost= data[i],
@@ -47,8 +46,8 @@ function storeBlog(req, res, args){
 		//set the blog to be updated in an hour
 		setInterval(function(){
 			updateBlog(baseHostName);
-			util.log(hostName + " updated"); 
-			}, 1000*60*60 );
+			util.log(baseHostName + " updated"); 
+			}, 1000*10 );
 		res.json({"status": 200,"msg": "OK"});
 	});
 
@@ -92,7 +91,41 @@ function getTrends(req, res){
 
 //update blog with new counts from tumblr API
 function updateBlog(blogName){
-	//TODO: everything.
+	var tumReq = tumblr.liked(blogName, function(data){
+		//parse thru the returned data and store into database
+		for (var i = 0; i < data.length; i++){
+			var currentPost= data[i],
+				postID = currentPost["id"],
+				url = currentPost["post_url"],
+				text = currentPost["text"],
+				image = currentPost["image_permalink"],
+				date = currentPost["date"],
+				count = currentPost["note_count"];
+
+			sql.getPost(postID, function(queryResult){
+				if (queryResult){
+					var sequence = queryResult["sequence"] + 1;
+					console.log(currentPost);
+					sql.insertNewTrack(postID, date, blogName, sequence, count);
+				} else {
+					//insert new post into the database
+					sql.insertGetBlog(postID, url, text, image, date, blogName, 1, count);
+				}
+			});
+		}
+
+	});
+
+	tumReq.on('error', function(e) {
+		// return error message to the log.
+		console.log(e);
+	});
+
+	//set timer to call update blog in one hour
+	setInterval(function(){
+		updateBlog(blogName);
+		util.log(blogName + " updated"); 
+		}, 1000*60*60 );
 }
 
 // extract the data for the post request on path /blog
