@@ -79,6 +79,14 @@ function getTrends(req, res){
 	res.json({"trending": [], "order": order, "limit": limit});
 }
 
+//Create table if database is not set up, else restart tracking on previously tracked blogs. 
+function serverStart(){
+	sql.init(function(blogname){
+		setInterval(updateBlog, HOUR, blogname);
+		console.log("tracking " + blogname);
+	});
+}
+
 //update blog with new counts from tumblr API
 function updateBlog(blogname, callback){
 	callback = callback ? callback : function(){};
@@ -132,6 +140,7 @@ app.post('/blog', handleBlogPost);
 app.get('/blog/:blogname/trends', getBlogTrends);
 app.get('/blogs/trends', getTrends);
 
+serverStart();
 
 /* Sit back, and listen to the beautiful sound of port */
 app.listen(PORT);

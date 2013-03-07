@@ -14,17 +14,26 @@ function logIfError(success){
  * post(postID(Key), url, text, image, date)
  * tracking(hostName(Key), postid(Key), Sequence(Key), count, time)
  */
-db.run("CREATE TABLE IF NOT EXISTS post(postID int NOT NULL, url varchar(255) NOT NULL,\
-	text TEXT, image varchar(255), date varchar(20) NOT NULL, PRIMARY KEY (postID))", 
-	logIfError(function(row) {console.log("created table posts");})
-);
+exports.init = function(callback){
+	db.serialize(function(){
+		db.run("CREATE TABLE IF NOT EXISTS post(postID int NOT NULL, url varchar(255) NOT NULL,\
+			text TEXT, image varchar(255), date varchar(20) NOT NULL, PRIMARY KEY (postID))", 
+			logIfError(function(row) {console.log("created table posts");})
+		);
 	 
-	 
-db.run("CREATE TABLE IF NOT EXISTS tracking(hostName varchar(255) NOT NULL, postID int \
-	NOT NULL, sequence int NOT NULL, count int NOT NULL, time varchar(20) NOT NULL, \
-	PRIMARY KEY(hostName, postID, sequence))",
-	logIfError(function(row) {console.log("created table tracking");})
-);
+		db.run("CREATE TABLE IF NOT EXISTS tracking(hostName varchar(255) NOT NULL, postID int \
+			NOT NULL, sequence int NOT NULL, count int NOT NULL, time varchar(20) NOT NULL, \
+			PRIMARY KEY(hostName, postID, sequence))",
+			logIfError(function(row) {console.log("created table tracking");})
+		);
+
+		db.each("SELECT distinct hostName FROM tracking", 
+			logIfError(function(row){
+				callback(row.hostName);
+			})
+		);
+	});
+}
 	
 /*
  * Handle insertion of each blog post for getBlog.
