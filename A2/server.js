@@ -50,6 +50,18 @@ function getBlogTrends(req, res){
 		limit = req.query.limit,
 		blogname = req.params.blogname;
 		
+	if (order == "Trending"){
+		// get the latest tracking info for every post liked by blog
+		// for each post, compare latest tracking info to last hour's tracking info
+		// return limit number of posts with highest like difference in the past hour
+	}
+	if (order == "Recent"){
+		// get the most recent posts from post table up to limit
+		// for each post get the most up to date tracking info from tracking table
+	} else {
+		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
+	}
+		
 	res.json({"trending": [{"not-a-real-field":blogname}], "order": order, "limit": limit});
 }
 
