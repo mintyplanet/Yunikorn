@@ -105,7 +105,7 @@ function updateBlog(blogname, callback){
 			sql.getLatestPostStats(postID, function(queryResult) {
 				if (queryResult){ //this post is already being tracked
 					var sequence = queryResult["sequence"] + 1;
-					sql.createPostStat(postID, Date(), blogname, sequence, count);
+					sql.createPostStat(postID, blogname, sequence, count);
 				} else {
 					//insert new blog info into the database
 					sql.registerBlog(postID, url, text, image, date, blogname, count);

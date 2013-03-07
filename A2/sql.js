@@ -10,6 +10,10 @@ function logIfError(success){
 	};
 }
 
+function unixTimestamp(time){
+	return Math.round(time/1000);
+}
+
 /* creat tables with the following schema:
  * post(postID(Key), url, text, image, date)
  * tracking(hostName(Key), postid(Key), Sequence(Key), count, time)
@@ -17,12 +21,12 @@ function logIfError(success){
 exports.init = function(callback){
 	db.serialize(function(){
 		db.run("CREATE TABLE IF NOT EXISTS post(postID int NOT NULL, url varchar(255) NOT NULL,\
-			text TEXT, image varchar(255), date varchar(20) NOT NULL, PRIMARY KEY (postID))", 
+			text TEXT, image varchar(255), date int NOT NULL, PRIMARY KEY (postID))", 
 			logIfError(function(row) {console.log("created table posts");})
 		);
 	 
 		db.run("CREATE TABLE IF NOT EXISTS tracking(hostName varchar(255) NOT NULL, postID int \
-			NOT NULL, sequence int NOT NULL, count int NOT NULL, time varchar(20) NOT NULL, \
+			NOT NULL, sequence int NOT NULL, count int NOT NULL, time int NOT NULL, \
 			PRIMARY KEY(hostName, postID, sequence))",
 			logIfError(function(row) {console.log("created table tracking");})
 		);
@@ -38,15 +42,15 @@ exports.init = function(callback){
 /*
  * Handle insertion of each blog post for getBlog.
  */
-exports.registerBlog = function(postID, url, text, image, date, blogname, count){
+exports.registerBlog = function(postID, url, text, image, blogpubdate, blogname, count){
 	db.serialize(function(){
-		db.run("INSERT INTO post VALUES (?,?,?,?,?)", [postID, url, text, image, date], 
+		db.run("INSERT INTO post VALUES (?,?,?,?,?)", [postID, url, text, image, unixTimestamp(Date.parse(blogpubdate))], 
 			logIfError(function(row){ 
 				console.log("inserted " + postID + " into post"); 
 			})
 		);
 
-		db.run("INSERT INTO tracking VALUES (?,?,1,?,?)", [blogname, postID, count, date],
+		db.run("INSERT INTO tracking VALUES (?,?,1,?,?)", [blogname, postID, count, unixTimestamp(Date.now())],
 			logIfError(function(row){
 				//console.log("inserted " + postID + " into tracking"); 
 			})
@@ -88,8 +92,8 @@ exports.getLatestPostStats = function(postID, callback){
 	);
 }
 
-exports.createPostStat = function(postID, date, blogname, sequence, count){
-	db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [blogname, postID, sequence, count, date],
+exports.createPostStat = function(postID, blogname, sequence, count){
+	db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [blogname, postID, sequence, count, unixTimestamp(Date.now())],
 		logIfError(function(row){
 			//console.log("inserted " + postID + " into tracking");
 		})
