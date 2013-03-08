@@ -15,13 +15,13 @@ function unixTimestamp(time){
 }
 
 /* creat tables with the following schema:
- * post(postID(Key), url, text, image, date)
- * tracking(hostName(Key), postid(Key), Sequence(Key), count, time)
+ * post(postID(Key), url, text, image, date, latest_increment)
+ * tracking(hostName(Key), postid(Key), Sequence(Key), count, time, increment)
  */
 exports.init = function(callback){
 	db.serialize(function(){
 		db.run("CREATE TABLE IF NOT EXISTS post(postID int NOT NULL, url varchar(255) NOT NULL,\
-			text TEXT, image varchar(255), date int NOT NULL, PRIMARY KEY (postID))", 
+			text TEXT, image varchar(255), date int NOT NULL, latest_increment int NOT NULL, PRIMARY KEY (postID))", 
 			logIfError(function(row) {console.log("created table posts");})
 		);
 	 
@@ -44,7 +44,8 @@ exports.init = function(callback){
  */
 exports.registerBlog = function(postID, url, text, image, blogpubdate, blogname, count){
 	db.serialize(function(){
-		db.run("INSERT INTO post VALUES (?,?,?,?,?)", [postID, url, text, image, unixTimestamp(Date.parse(blogpubdate))], 
+		// Note difference initialized at 0
+		db.run("INSERT INTO post VALUES (?,?,?,?,?,0)", [postID, url, text, image, unixTimestamp(Date.parse(blogpubdate))], 
 			logIfError(function(row){ 
 				console.log("inserted " + postID + " into post"); 
 			})
@@ -92,10 +93,32 @@ exports.getLatestPostStats = function(postID, callback){
 	);
 }
 
-exports.createPostStat = function(postID, blogname, sequence, count){
+exports.createPostStat = function(postID, blogname, sequence, count, latest_increment){
+
+	// Post no longer static => Updates for latest_increment
+	db.run("UPDATE post SET latest_increment = ? WHERE postID = ?", [latest_increment, postID], 
+			logIfError(function(row){ 
+				console.log("updated " + postID + " into post with latest_increment " + latest_increment); 
+			})
+		);
+
 	db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [blogname, postID, sequence, count, unixTimestamp(Date.now())],
 		logIfError(function(row){
 			//console.log("inserted " + postID + " into tracking");
+		})
+	);
+}
+
+/* Do not confuse with getLatestPostStats => this is getting information from post table
+ * This function is to find the note difference of the given blogname for updating 
+ */
+exports.getLatestPostInfo = function (postID, callback) {
+	
+	// Get post information
+	db.get("SELECT * FROM post WHERE postID = ? ", [postID],
+		logIfError(function(row){
+			//console.log("get latest post stats successful");
+			callback(row);
 		})
 	);
 }
