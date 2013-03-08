@@ -78,6 +78,21 @@ function getTrends(req, res){
 	//TODO: Well, basically everything.
 	var order = req.query.order,
 		limit = req.query.limit;
+
+	if (order == "Trending"){
+		// union information from getBlogTrends
+		// get the latest tracking info for every post liked by blog
+		// for each post, compare latest tracking info to last hour's tracking info
+		// return limit number of posts with highest like difference in the past hour
+	}
+	if (order == "Recent"){
+		// union information gotten from getBlogTrends
+		// get the most recent posts from post table up to limit
+		// for each post get the most up to date tracking info from tracking table
+		
+	} else {
+		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
+	}
 	
 	res.json({"trending": [], "order": order, "limit": limit});
 }
@@ -108,7 +123,13 @@ function updateBlog(blogname, callback){
 			sql.getLatestPostStats(postID, function(queryResult) {
 				if (queryResult){ //this post is already being tracked
 					var sequence = queryResult["sequence"] + 1;
-					sql.createPostStat(postID, blogname, sequence, count);
+
+					// Getting latest increment from database
+					sql.getLatestPostInfo(postID, function(postResult) {
+						var latest_increment = post.note_count - postResult["latest_increment"];
+						sql.createPostStat(postID, blogname, sequence, count, latest_increment);
+					});
+					
 				} else {
 					//insert new blog info into the database
 					sql.registerBlog(postID, url, text, image, date, blogname, count);
