@@ -92,8 +92,31 @@ exports.getLatestPostStats = function(postID, callback){
 	);
 }
 
+<<<<<<< HEAD
 exports.createPostStat = function(postID, blogname, sequence, count){
 	db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [blogname, postID, sequence, count, unixTimestamp(Date.now())],
+=======
+/* Do not confuse with getLatestPostStats
+ * getRecentPostStats gets the stats of the most recent posts
+ * liked by a blog by date the post was created
+ */
+exports.getRecentPostStats = function(blogname, limit, callback) {
+	db.all("(SELECT * FROM post NATURAL JOIN \
+		SELECT * FROM tracking WHERE hostName = ?) ORDER BY date DESC \
+		LIMIT ?", [blogname, limit],
+		logIfError(function(row){
+			callback(row);
+		})
+	);
+}
+
+exports.getTrendingPostStats = function(blogname, limit, callback) {
+	
+}
+
+exports.createPostStat = function(postID, date, blogname, sequence, count){
+	db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [blogname, postID, sequence, count, date],
+>>>>>>> getRecentPostStats sql function
 		logIfError(function(row){
 			//console.log("inserted " + postID + " into tracking");
 		})
