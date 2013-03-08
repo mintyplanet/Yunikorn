@@ -83,12 +83,16 @@ exports.showTables = function(){
 	});
 }
 
-exports.getLatestPostStats = function(postID, callback){
+exports.getLatestPostStats = function(postID, callback, json){
 	db.get("SELECT * FROM tracking WHERE postID = ? \
 		AND sequence = (SELECT MAX(sequence) FROM tracking WHERE postID = ?)", [postID, postID],
-		logIfError(function(row){
+		logIfError(function(row, json){
 			//console.log("get latest post stats successful");
-			callback(row);
+			if (json) {
+				callback(row, json);
+			} else {
+				callback(row);
+			}
 		})
 	);
 }
@@ -123,20 +127,23 @@ exports.getLatestPostInfo = function (postID, callback) {
 	);
 }
 
-/* Do not confuse with getLatestPostStats
- * getRecentPostStats gets the stats of the most recent posts
- * liked by a blog by date the post was created
+/* gets the most recently made posts liked by blog hostname
  */
-exports.getRecentPostStats = function(blogname, limit, callback) {
-	db.all("(SELECT * FROM post NATURAL JOIN \
-		SELECT * FROM tracking WHERE hostName = ?) ORDER BY date DESC \
-		LIMIT ?", [blogname, limit],
-		logIfError(function(row){
-			callback(row);
+exports.getRecentPostsByBlog = function(blogname, limit, callback, json) {
+	db.each("(SELECT * FROM post NATURAL JOIN \
+		SELECT postID from tracking WHERE hostname = ?) ORDER BY date DESC \
+		LIMIT ?"), [blogname, limit],
+		logIfError(function(row, json){
+			callback(row, json);
 		})
 	);
 }
 
-exports.getTrendingPostStats = function(blogname, limit, callback) {
-	
+exports.getPostStats = function(postID, callback, json) {
+	db.each("(SELECT * FROM tracking WHERE postID = ?) ORDER BY sequence DESC"),
+		postID,
+		logIfError(function(row, json){
+			callback(row, json);
+		})
+	);
 }
