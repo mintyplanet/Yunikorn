@@ -47,8 +47,9 @@ function getBlogTrends(req, res){
 	
 	// getting the parameters is already done.
 	var order = req.query.order,
-		limit = req.query.limit,
+		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
 		blogname = req.params.blogname;
+
 		
 	if (order == "Trending"){
 		// get the latest tracking info for every post liked by blog
@@ -58,14 +59,50 @@ function getBlogTrends(req, res){
 	if (order == "Recent"){
 		// get the most recent posts from post table up to limit
 		// for each post get the most up to date tracking info from tracking table
-		
-		
+		var postsJson = {"trending": [], "order": order, "limit": limit};
+
+		sql.getRecentPostsByBlog(blogname, limit, function(queryResult, postsJson) {
+			if (queryResult) {
+				var url = queryResult["url"],
+					text = queryResult["text"],
+					image = queryResult["image"],
+					date = queryResult["date"];
+					
+				postsJson["trending"].push(
+					{"url": url,
+					"text": text,
+					"image": image,
+					"date": date,
+					"last_track": "",
+					"last_count": 0,
+					"tracking": []});
+					
+				sql.getLatestPostStats(queryResult["postID"], function(latestStats, postsJson) {
+					if (latestStats) {
+						postsJson["last_track"] = new Date(latestStats["time"] * 1000);
+						postsJson["last_count"] = latestStats["count"];
+					}
+				}, postsJson);
+					
+				sql.getPostStats(queryResult["postID"], function(statsRow) {
+					if (statsRow) {
+						var timestamp = new Date(statsRow["time"] * 1000),
+							sequence = statsRow["sequence"],
+							increment = statsRow["increment"];
+						postsJson["trending"]["tracking"].push(
+							{"timestamp": timestamp,
+							"sequence": sequence,
+							"increment", increment});
+					}
+				}, postsJson);
+					
+			
 		
 	} else {
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
 	}
 		
-	res.json({"trending": [{"not-a-real-field":blogname}], "order": order, "limit": limit});
+	res.json(postsJson);
 }
 
 /*return the json of trends tracked by every blog.
