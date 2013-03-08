@@ -58,6 +58,9 @@ function getBlogTrends(req, res){
 	if (order == "Recent"){
 		// get the most recent posts from post table up to limit
 		// for each post get the most up to date tracking info from tracking table
+		
+		
+		
 	} else {
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
 	}
