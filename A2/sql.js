@@ -94,6 +94,9 @@ exports.getLatestPostStats = function(postID, callback){
 
 exports.createPostStat = function(postID, blogname, sequence, count){
 	db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [blogname, postID, sequence, count, unixTimestamp(Date.now())],
+		logIfError(function(row){
+			//console.log("inserted " + postID + " into tracking");
+		})
 	);
 }
 
@@ -113,11 +116,4 @@ exports.getRecentPostStats = function(blogname, limit, callback) {
 
 exports.getTrendingPostStats = function(blogname, limit, callback) {
 	
-}
-
-getRecentPostStats sql function
-		logIfError(function(row){
-			//console.log("inserted " + postID + " into tracking");
-		})
-	);
 }
