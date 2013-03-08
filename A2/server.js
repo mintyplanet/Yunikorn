@@ -96,7 +96,8 @@ function getBlogTrends(req, res){
 					}
 				}, postsJson);
 					
-			
+			}
+		}, postsJson);
 		
 	} else {
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
