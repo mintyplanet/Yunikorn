@@ -41,7 +41,7 @@ function storeBlog(req, res, args){
  * method type: get
  * sends: {limit:(optional), order:"Trending"| "Recent"}
  * receive: see csc309 webpage
- */
+ */ 
 function getBlogTrends(req, res){
 	//TODO: Well, basically everything
 	
@@ -50,7 +50,6 @@ function getBlogTrends(req, res){
 		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
 		blogname = req.params.blogname;
 
-		
 	if (order == "Trending"){
 		// get the latest tracking info for every post liked by blog
 		// for each post, compare latest tracking info to last hour's tracking info
