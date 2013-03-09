@@ -26,7 +26,7 @@ exports.init = function(callback){
 		);
 	 
 		db.run("CREATE TABLE IF NOT EXISTS tracking(hostName varchar(255) NOT NULL, postID int \
-			NOT NULL, sequence int NOT NULL, count int NOT NULL, time int NOT NULL, \
+			NOT NULL, sequence int NOT NULL, count int NOT NULL, time int NOT NULL, increment int NOT NULL,\
 			PRIMARY KEY(hostName, postID, sequence))",
 			logIfError(function(row) {console.log("created table tracking");})
 		);
@@ -44,14 +44,15 @@ exports.init = function(callback){
  */
 exports.registerBlog = function(postID, url, text, image, blogpubdate, blogname, count){
 	db.serialize(function(){
-		// Note difference initialized at 0
+
+		// latest_increment + increment initialized at 0
 		db.run("INSERT INTO post VALUES (?,?,?,?,?,0)", [postID, url, text, image, unixTimestamp(Date.parse(blogpubdate))], 
 			logIfError(function(row){ 
 				console.log("inserted " + postID + " into post"); 
 			})
 		);
 
-		db.run("INSERT INTO tracking VALUES (?,?,1,?,?)", [blogname, postID, count, unixTimestamp(Date.now())],
+		db.run("INSERT INTO tracking VALUES (?,?,1,?,?,0)", [blogname, postID, count, unixTimestamp(Date.now())],
 			logIfError(function(row){
 				//console.log("inserted " + postID + " into tracking"); 
 			})
@@ -106,9 +107,10 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 			})
 		);
 
-	db.run("INSERT INTO tracking VALUES (?,?,?,?,?)", [blogname, postID, sequence, count, unixTimestamp(Date.now())],
+	db.run("INSERT INTO tracking VALUES (?,?,?,?,?,?)", [blogname, postID, sequence, count, unixTimestamp(Date.now()),
+		latest_increment],
 		logIfError(function(row){
-			//console.log("inserted " + postID + " into tracking");
+			console.log("inserted " + postID + " into tracking with increment " + latest_increment);
 		})
 	);
 }
