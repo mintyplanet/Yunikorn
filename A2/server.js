@@ -147,68 +147,11 @@ function getBlogTrends(req, res){
 	res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
 }
 
-
-/* Helper function for getTrends; takes care of Recent order!
- */
-function getRecentTrends(res, jsonVar, limit)
+/* Helper function for getTrends; takes care of Trending order! */
+function getJsonTrends(res, jsonVar, order, limit, callback)
 {
 	// Get the most recent posts by limit
-	sql.getRecentPosts(limit, function(postResult) {
-
-		// For every post, get the tracking information
-		postResult.forEach(function (postRow) {
-
-			var tracking = [];
-
-			// Get the tracking information for the post
-			sql.getTrackingInfo(postRow.postID, limit, function(trackResult) {
-
-				var last_count,
-					last_track,
-					lengthTrack = trackResult.length;
-
-				// Get all tracking information for the post and put under "tracking"
-				// (to be added to JSON after all compiled together)
-				for (var i=0; i < lengthTrack; i++)
-				{
-					tracking.push ({
-						"timestamp": trackResult[i].time,
-						"sequence": trackResult[i].sequence,
-						"increment": trackResult[i].increment,
-						"count": trackResult[i].count
-					});
-					
-					// Get the last count (since sorted by descending, i should be 0)
-					if (i == 0)
-					{
-						last_count = trackResult[i].count;
-						last_track = trackResult[i].time;
-					}
-				}
-
-				// Put together the JSON
-				jsonVar["trending"].push({
-					"url": postRow.url,	
-					"text": postRow.text,
-					"image": postRow.image,
-					"date": postRow.date,
-					"last_track": last_track,
-					"last_count": last_count,
-					"tracking": tracking
-				});	
-
-				res.json(jsonVar);
-			});
-		});	
-	});	
-}
-
-/* Helper function for getTrends; takes care of Trending order!
- */
-function getTrendingTrends(res, jsonVar, limit, callback)
-{
-	// Get the most recent posts by limit
-	sql.getTrendingPosts(limit, function(postResult) {
+	sql.getPosts(order, limit, function(postResult) {
 		
 		var counter = 0,
 			postLength = postResult.length;
@@ -228,18 +171,22 @@ function getTrendingTrends(res, jsonVar, limit, callback)
 				// (to be added to JSON after all compiled together)
 				for (var i=0; i < lengthTrack; i++)
 				{
+					var test = new Date();
 					tracking.push ({
-						"timestamp": trackResult[i].time,
+						"timestamp": new Date(trackResult[i].time).toLocaleString(),
 						"sequence": trackResult[i].sequence,
 						"increment": trackResult[i].increment,
 						"count": trackResult[i].count
 					});
+
+					console.log("Time: " +  trackResult[i].time + " lala: " + 
+						new Date(trackResult[i].time));
 					
 					// Get the last count (since sorted by descending, i should be 0)
 					if (i == 0)
 					{
 						last_count = trackResult[i].count;
-						last_track = trackResult[i].time;
+						last_track = new Date(trackResult[i].time).toLocaleString();
 					}
 
 					if (i == (lengthTrack - 1))
@@ -249,7 +196,7 @@ function getTrendingTrends(res, jsonVar, limit, callback)
 							"url": postRow.url,	
 							"text": postRow.text,
 							"image": postRow.image,
-							"date": postRow.date,
+							"date": new Date(postRow.date).toLocaleString(),
 							"last_track": last_track,
 							"last_count": last_count,
 							"tracking": tracking
@@ -277,18 +224,17 @@ function getTrends(req, res){
 	var order = req.query.order,
 		limit = req.query.limit;
 
-	//var URL, text, image, date, last_track, last_count, order, limit,
-	//	timestamp, sequence, increment, count;
-
 	var jsonVar = {"trending": [], "order": order, "limit": limit};
 
 	if (order == "Trending"){
-		getTrendingTrends(res, jsonVar, limit, function(jsonObj) {
+		getJsonTrends(res, jsonVar, "latest_increment", limit, function(jsonObj) {
 			res.json(jsonObj);
 		});
 	}
 	else if (order == "Recent"){
-		getRecentTrends(res, jsonVar, limit);
+		getJsonTrends(res, jsonVar, "date", limit, function(jsonObj) {
+			res.json(jsonObj);
+		});
 		
 	} else {
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});

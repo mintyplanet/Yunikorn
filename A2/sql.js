@@ -10,9 +10,10 @@ function logIfError(success){
 	};
 }
 
+/*
 function unixTimestamp(time){
 	return Math.round(time/1000);
-}
+}*/
 
 /* creat tables with the following schema:
  * post(postID(Key), url, text, image, date, latest_increment)
@@ -46,13 +47,13 @@ exports.registerBlog = function(postID, url, text, image, blogpubdate, blogname,
 	db.serialize(function(){
 
 		// latest_increment + increment initialized at 0
-		db.run("INSERT INTO post VALUES (?,?,?,?,?,0)", [postID, url, text, image, unixTimestamp(Date.parse(blogpubdate))], 
+		db.run("INSERT INTO post VALUES (?,?,?,?,?,0)", [postID, url, text, image, Date.parse(blogpubdate)], 
 			logIfError(function(row){ 
 				console.log("inserted " + postID + " into post"); 
 			})
 		);
 
-		db.run("INSERT INTO tracking VALUES (?,?,1,?,?,0)", [blogname, postID, count, unixTimestamp(Date.now())],
+		db.run("INSERT INTO tracking VALUES (?,?,1,?,?,0)", [blogname, postID, count, new Date().getTime()],
 			logIfError(function(row){
 				//console.log("inserted " + postID + " into tracking"); 
 			})
@@ -107,7 +108,7 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 			})
 		);
 
-	db.run("INSERT INTO tracking VALUES (?,?,?,?,?,?)", [blogname, postID, sequence, count, unixTimestamp(Date.now()),
+	db.run("INSERT INTO tracking VALUES (?,?,?,?,?,?)", [blogname, postID, sequence, count, new Date().getTime(),
 		latest_increment],
 		logIfError(function(row){
 			//console.log("inserted " + postID + " into tracking with increment " + latest_increment);
@@ -149,7 +150,7 @@ exports.getPostStats = function(postID, callback, json) {
 
 /* Gets the most recent posts in the database, limited by limit
  */
-exports.getRecentPosts = function(limit, callback) {
+exports.getPosts = function(order, limit, callback) {
 	db.all("SELECT * FROM post ORDER BY date DESC LIMIT ?", [limit],
 		logIfError(function(rows){
 			//rows.forEach(function (row) {
@@ -160,22 +161,6 @@ exports.getRecentPosts = function(limit, callback) {
 		})
 	);
 }
-
-
-/* Gets the trending posts in the database, limited by limit
- */
-exports.getTrendingPosts = function(limit, callback) {
-	db.all("SELECT * FROM post ORDER BY latest_increment DESC LIMIT ?", [limit],
-		logIfError(function(rows){
-			//rows.forEach(function (row) {
-			//    console.log("Returned row: " + row.postID + " and date: " + row.date);
-			//});
-				
-			callback(rows);
-		})
-	);
-}
-
 
 
 /* This function is the same as getPostStats but without the json callback. 
