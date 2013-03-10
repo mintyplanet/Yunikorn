@@ -49,16 +49,55 @@ function getBlogTrends(req, res){
 	var order = req.query.order,
 		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
 		blogname = req.params.blogname;
+		postsJson = {"trending": [], "order": order, "limit": limit};
+
 
 	if (order == "Trending"){
 		// get the latest tracking info for every post liked by blog
 		// for each post, compare latest tracking info to last hour's tracking info
 		// return limit number of posts with highest like difference in the past hour
+		
+		sql.getTrendingPostsByBlog(blogname, limit, function(queryResult, postsJson) {
+			if (queryResult) {
+				var url = queryResult["url"],
+					text = queryResult["text"],
+					image = queryResult["image"],
+					date = queryResult["date"];
+					
+				postsJson["trending"].push(
+					{"url": url,
+					"text": text,
+					"image": image,
+					"date": date,
+					"last_track", "",
+					"last_count": 0,
+					"tracking": []});
+					
+				sql.getLatestPostStats(queryResult["postID"], function(latestStats, postsJson) {
+					if (latestStats) {
+						postsJson["last_track"] = new Date(latestStats["time"] * 1000);
+						postsJson["last_count"] = latestStats["count"];
+					}
+				}, postsJson);
+					
+				sql.getPostStats(queryResult["postID"], function(statsRow) {
+					if (statsRow) {
+						var timestamp = new Date(statsRow["time"] * 1000),
+							sequence = statsRow["sequence"],
+							increment = statsRow["increment"];
+						postsJson["trending"]["tracking"].push(
+							{"timestamp": timestamp,
+							"sequence": sequence,
+							"increment", increment});
+					}
+				}, postsJson);
+			}
+			
+		}, postsJson);
 	}
 	if (order == "Recent"){
 		// get the most recent posts from post table up to limit
 		// for each post get the most up to date tracking info from tracking table
-		var postsJson = {"trending": [], "order": order, "limit": limit};
 
 		sql.getRecentPostsByBlog(blogname, limit, function(queryResult, postsJson) {
 			if (queryResult) {
