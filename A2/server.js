@@ -9,6 +9,17 @@ var express = require('express'),
 var PORT = 31335; //Yuki's assigned port
 var HOUR = 1000*10; // in milliseconds.	Currently set to 10 seconds for productive debugging...
 
+// Convert time into what's required for assignment
+function convTime(time)
+{
+	var newTime = new Date(time);
+	var timeString = newTime.getFullYear() + "-" + ('0' + newTime.getMonth()).slice(-2) + "-"
+		+ ('0' + newTime.getDate()).slice(-2) + " " + ('0' + newTime.getHours()).slice(-2) + ":"
+		+ ('0' + newTime.getMinutes()).slice(-2) + ":" + ('0' + newTime.getSeconds()).slice(-2) + " EST";
+	
+	return timeString;
+}
+
 /* store liked post of blog into database
  * host - /blog
  * method type: Post
@@ -171,22 +182,18 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 				// (to be added to JSON after all compiled together)
 				for (var i=0; i < lengthTrack; i++)
 				{
-					var test = new Date();
 					tracking.push ({
-						"timestamp": new Date(trackResult[i].time).toLocaleString(),
+						"timestamp": convTime(trackResult[i].time),
 						"sequence": trackResult[i].sequence,
 						"increment": trackResult[i].increment,
 						"count": trackResult[i].count
 					});
-
-					console.log("Time: " +  trackResult[i].time + " lala: " + 
-						new Date(trackResult[i].time));
 					
 					// Get the last count (since sorted by descending, i should be 0)
 					if (i == 0)
 					{
 						last_count = trackResult[i].count;
-						last_track = new Date(trackResult[i].time).toLocaleString();
+						last_track = convTime(trackResult[i].time);
 					}
 
 					if (i == (lengthTrack - 1))
@@ -196,7 +203,7 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 							"url": postRow.url,	
 							"text": postRow.text,
 							"image": postRow.image,
-							"date": new Date(postRow.date).toLocaleString(),
+							"date": convTime(postRow.date),
 							"last_track": last_track,
 							"last_count": last_count,
 							"tracking": tracking
