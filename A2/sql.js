@@ -103,34 +103,19 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 	// Post no longer static => Updates for latest_increment
 	db.run("UPDATE post SET latest_increment = ? WHERE postID = ?", [latest_increment, postID], 
 			logIfError(function(row){ 
-				console.log("updated " + postID + " into post with latest_increment " + latest_increment); 
+				//console.log("updated " + postID + " into post with latest_increment " + latest_increment); 
 			})
 		);
 
 	db.run("INSERT INTO tracking VALUES (?,?,?,?,?,?)", [blogname, postID, sequence, count, unixTimestamp(Date.now()),
 		latest_increment],
 		logIfError(function(row){
-			console.log("inserted " + postID + " into tracking with increment " + latest_increment);
+			//console.log("inserted " + postID + " into tracking with increment " + latest_increment);
 		})
 	);
 }
 
-/* Do not confuse with getLatestPostStats => this is getting information from post table
- * This function is to find the note difference of the given blogname for updating 
- */
-exports.getLatestPostInfo = function (postID, callback) {
-	
-	// Get post information
-	db.get("SELECT * FROM post WHERE postID = ? ", [postID],
-		logIfError(function(row){
-			//console.log("get latest post stats successful");
-			callback(row);
-		})
-	);
-}
 
-/* gets the most recently made posts liked by blog hostname
- */
 exports.getRecentPostsByBlog = function(blogname, limit, callback, json) {
 	db.each("(SELECT * FROM post NATURAL JOIN \
 		SELECT postID from tracking WHERE hostname = ?) ORDER BY date DESC \
@@ -141,11 +126,40 @@ exports.getRecentPostsByBlog = function(blogname, limit, callback, json) {
 	);
 }
 
+
 exports.getPostStats = function(postID, callback, json) {
-	db.each("(SELECT * FROM tracking WHERE postID = ?) ORDER BY sequence DESC"),
+	db.each("(SELECT * FROM tracking WHERE postID = ?) ORDER BY sequence DESC",
 		postID,
 		logIfError(function(row, json){
 			callback(row, json);
 		})
 	);
 }
+
+
+/* Gets the most recent posts in the database, limited by limit
+ */
+exports.getRecentPosts = function(limit, callback) {
+	db.all("SELECT * FROM post ORDER BY date DESC LIMIT ?", [limit],
+		logIfError(function(rows){
+			//rows.forEach(function (row) {
+			//    console.log("Returned row: " + row.postID + " and date: " + row.date);
+			//});
+				
+			callback(rows);
+		})
+	);
+}
+
+
+/* This function is the same as getPostStats but without the json callback. 
+ * Will change it later to reduce redundancy; not sure how to user it properly atm ._.
+ */
+exports.getRecentTracking = function(postID, limit, callback) {
+	db.all("SELECT * FROM tracking WHERE postID = ? ORDER BY sequence DESC LIMIT ?", [postID, limit],
+		logIfError(function(row){
+			callback(row);
+		})
+	);
+}
+
