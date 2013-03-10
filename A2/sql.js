@@ -115,7 +115,7 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 	);
 }
 
-
+/*
 exports.getRecentPostsByBlog = function(blogname, limit, callback, json) {
 	db.each("(SELECT * FROM post NATURAL JOIN \
 		SELECT postID FROM tracking WHERE hostname = ?) ORDER BY date DESC \
@@ -144,7 +144,7 @@ exports.getPostStats = function(postID, callback, json) {
 			callback(row, json);
 		})
 	);
-}
+}*/
 
 
 /* Gets the most recent posts in the database, limited by limit
@@ -162,13 +162,29 @@ exports.getRecentPosts = function(limit, callback) {
 }
 
 
+/* Gets the trending posts in the database, limited by limit
+ */
+exports.getTrendingPosts = function(limit, callback) {
+	db.all("SELECT * FROM post ORDER BY latest_increment DESC LIMIT ?", [limit],
+		logIfError(function(rows){
+			//rows.forEach(function (row) {
+			//    console.log("Returned row: " + row.postID + " and date: " + row.date);
+			//});
+				
+			callback(rows);
+		})
+	);
+}
+
+
+
 /* This function is the same as getPostStats but without the json callback. 
  * Will change it later to reduce redundancy; not sure how to user it properly atm ._.
  */
-exports.getRecentTracking = function(postID, limit, callback) {
+exports.getTrackingInfo = function(postID, limit, callback) {
 	db.all("SELECT * FROM tracking WHERE postID = ? ORDER BY sequence DESC LIMIT ?", [postID, limit],
-		logIfError(function(row){
-			callback(row);
+		logIfError(function(rows){
+			callback(rows);
 		})
 	);
 }
