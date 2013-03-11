@@ -1,7 +1,7 @@
 //sqlite3 database
 var sqlite3 = require('sqlite3').verbose();
 //database is in memory for now for developing purpose
-var db = new sqlite3.Database(':memory:');
+var db = new sqlite3.Database('./dbLog');//:memory:
 var util = require('util');
 
 function logIfError(success){
@@ -116,7 +116,7 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 	);
 }
 
-/*
+
 exports.getRecentPostsByBlog = function(blogname, limit, callback, json) {
 	db.each("(SELECT * FROM post NATURAL JOIN \
 		SELECT postID FROM tracking WHERE hostname = ?) ORDER BY date DESC \
@@ -145,13 +145,13 @@ exports.getPostStats = function(postID, callback, json) {
 			callback(row, json);
 		})
 	);
-}*/
+}
 
 
 /* Gets the most recent posts in the database, limited by limit
  */
 exports.getPosts = function(order, limit, callback) {
-	db.all("SELECT * FROM post ORDER BY date DESC LIMIT ?", [limit],
+	db.all("SELECT * FROM post ORDER BY ? DESC LIMIT ?", [order, limit],
 		logIfError(function(rows){
 			//rows.forEach(function (row) {
 			//    console.log("Returned row: " + row.postID + " and date: " + row.date);
