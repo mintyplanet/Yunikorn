@@ -13,10 +13,10 @@ var HOUR = 1000*10; // in milliseconds.	Currently set to 10 seconds for producti
 function convTime(time)
 {
 	var newTime = new Date(time);
-	var timeString = newTime.getFullYear() + "-" + ('0' + newTime.getMonth()).slice(-2) + "-"
+	
+	var timeString = newTime.getFullYear() + "-" + ('0' + (newTime.getMonth() + 1)).slice(-2) + "-"
 		+ ('0' + newTime.getDate()).slice(-2) + " " + ('0' + newTime.getHours()).slice(-2) + ":"
 		+ ('0' + newTime.getMinutes()).slice(-2) + ":" + ('0' + newTime.getSeconds()).slice(-2) + " EST";
-	
 	return timeString;
 }
 
@@ -61,7 +61,6 @@ function getBlogTrends(req, res){
 		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
 		blogname = req.params.blogname;
 		postsJson = {"trending": [], "order": order, "limit": limit};
-/*
 
 	if (order == "Trending"){
 		// get the latest tracking info for every post liked by blog
@@ -152,10 +151,7 @@ function getBlogTrends(req, res){
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
 	}
 		
-	res.json(postsJson);*/
-
-	// Only here to make it work for now
-	res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
+	res.json(postsJson);
 }
 
 /* Helper function for getTrends; takes care of Trending order! */
