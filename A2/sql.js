@@ -151,15 +151,36 @@ exports.getPostStats = function(postID, callback, json) {
 /* Gets the most recent posts in the database, limited by limit
  */
 exports.getPosts = function(order, limit, callback) {
-	db.all("SELECT * FROM post ORDER BY ? DESC LIMIT ?", [order, limit],
-		logIfError(function(rows){
-			//rows.forEach(function (row) {
-			//    console.log("Returned row: " + row.postID + " and date: " + row.date);
-			//});
+
+	// Recent = order by date, Trending = order by latest_increment
+	if (order == "Recent")
+	{
+		db.all("SELECT * FROM post ORDER BY date DESC LIMIT ?", [limit],
+			logIfError(function(rows){
+				console.log ("ORDER: " + order + " LIMIT: " + limit);
+				rows.forEach(function (row) {
+				    console.log("Returned row: " + row.url + " and date: " + row.date
+					+ " and inc: " + row.latest_increment);
+				});
 				
-			callback(rows);
-		})
-	);
+				callback(rows);
+			})
+		);
+	} 
+	else if (order == "Trending")
+	{
+		db.all("SELECT * FROM post ORDER BY latest_increment DESC LIMIT ?", [limit],
+			logIfError(function(rows){
+				console.log ("ORDER: " + order + " LIMIT: " + limit);
+				rows.forEach(function (row) {
+				    console.log("Returned row: " + row.url + " and date: " + row.date
+					+ " and inc: " + row.latest_increment);
+				});
+				
+				callback(rows);
+			})
+		);
+	}
 }
 
 

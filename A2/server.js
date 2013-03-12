@@ -165,7 +165,7 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 
 		// For every post, get the tracking information
 		postResult.forEach(function (postRow) {
-			
+			console.log("URL: " + postRow.url);
 			var tracking = [];
 			// Get the tracking information for the post
 			sql.getTrackingInfo(postRow.postID, limit, function(trackResult) {
@@ -205,10 +205,11 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 							"tracking": tracking
 						});	
 
-						// Race Condition?
 						counter++;
 						if (counter == postLength)
+						{
 							callback(jsonVar);
+						}
 					}
 				}	
 			});
@@ -225,20 +226,13 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 function getTrends(req, res){
 	//TODO: Well, basically everything.
 	var order = req.query.order,
-		limit = req.query.limit;
+		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
+		jsonVar = {"trending": [], "order": order, "limit": limit};
 
-	var jsonVar = {"trending": [], "order": order, "limit": limit};
-
-	if (order == "Trending"){
-		getJsonTrends(res, jsonVar, "latest_increment", limit, function(jsonObj) {
+	if (order == "Trending" || order == "Recent"){
+		getJsonTrends(res, jsonVar, order, limit, function(jsonObj) {
 			res.json(jsonObj);
 		});
-	}
-	else if (order == "Recent"){
-		getJsonTrends(res, jsonVar, "date", limit, function(jsonObj) {
-			res.json(jsonObj);
-		});
-		
 	} else {
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
 	}
