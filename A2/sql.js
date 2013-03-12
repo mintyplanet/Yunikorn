@@ -100,12 +100,12 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 	);
 }
 
-exports.getPostsByBlogname = function(blogname, limit, order, callback, json) {
-	db.each("SELECT * FROM post NATURAL JOIN tracking \
+exports.getPostsLikedBy = function(blogname, order, limit, callback) {
+	db.all("SELECT distinct postID, url, text, image, strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date FROM post NATURAL JOIN tracking \
 				WHERE hostname = ? ORDER BY ? DESC LIMIT ?", 
 			[blogname, ORDERBY[order], limit],
 			function(error, row) {
-				callback(row, json);
+				callback(row);
 			}
 	);
 }
@@ -126,7 +126,7 @@ exports.getPostStats = function(postID, callback, json) {
 exports.getPosts = function(order, limit, callback) {
 
 	// Recent = order by date, Trending = order by latest_increment
-	db.all("SELECT * FROM post ORDER BY ? DESC LIMIT ?", [ORDERBY[order], limit],
+	db.all("SELECT postID, url, text, image, strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date FROM post ORDER BY ? DESC LIMIT ?", [ORDERBY[order], limit],
 		logIfError(function(rows){
 			//rows.forEach(function (row) {
 			//    console.log("Returned row: " + row.url + " and date: " + row.date
@@ -141,8 +141,8 @@ exports.getPosts = function(order, limit, callback) {
 /* This function is the same as getPostStats but without the json callback. 
  * Will change it later to reduce redundancy; not sure how to user it properly atm ._.
  */
-exports.getTrackingInfo = function(postID, limit, callback) {
-	db.all("SELECT * FROM tracking WHERE postID = ? ORDER BY sequence DESC LIMIT ?", [postID, limit],
+exports.getTrackingInfo = function(postID, callback) {
+	db.all("SELECT strftime('%Y-%m-%d %H:%M:%S EST', time/1000, 'unixepoch', 'localtime') AS timestamp, sequence, increment, count FROM tracking WHERE postID = ? ORDER BY sequence DESC", [postID],
 		logIfError(function(rows){
 			callback(rows);
 		})

@@ -11,26 +11,6 @@ var PORT = 31335; //Yuki's assigned port
 var HOUR = 1000*60*5; // in milliseconds.	Currently set to 10 seconds for productive debugging...
 
 
-/*******************Misc/Helper functions*****************************/
-// Convert time into what's required for assignment
-function convTime(time)
-{
-	var newTime = new Date(time);
-	
-	var timeString = newTime.getFullYear() + "-" + ('0' + (newTime.getMonth() + 1)).slice(-2) + "-"
-		+ ('0' + newTime.getDate()).slice(-2) + " " + ('0' + newTime.getHours()).slice(-2) + ":"
-		+ ('0' + newTime.getMinutes()).slice(-2) + ":" + ('0' + newTime.getSeconds()).slice(-2) + " EST";
-	return timeString;
-}
-
-//Create table if database is not set up, else restart tracking on previously tracked blogs. 
-function serverStart(){
-	sql.init(function(blogname){
-		setInterval(updateBlog, HOUR, blogname);
-		console.log("tracking " + blogname);
-	});
-}
-
 /*****************Registering and tracking blogs**********************/
 
 // extract the data for the post request on path /blog
@@ -62,7 +42,7 @@ function storeBlog(req, res, args){
 				if (err) {	// JSONP response was non-200
 					res.json(err.status, err);
 				} else {
-					res.json({"status": 200,"msg": "OK"});
+					res.json({"status": 200,"msg": "Blog is registered to be tracked"});
 					// Schedule the blog to run every hour
 					setInterval(updateBlog, HOUR, blogname);
 				}
@@ -110,162 +90,82 @@ function updateBlog(blogname, callback){
 
 /**********************Getting tracking info***************************/
 
-/*return the json of trends tracked by blog
- * host - /blog/{base-hostname}/trends
- * method type: get
- * sends: {limit:(optional), order:"Trending"| "Recent"}
- * receive: see csc309 webpage
- */ 
-function getBlogTrends(req, res){
-	
-	// getting the parameters is already done.
-	var order = req.query.order,
-		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
-		blogname = req.params.blogname;
-		postsJson = {"trending": [], "order": order, "limit": limit};
-
-	if (order == "Trending" || order == "Recent"){
-		// get the latest tracking info for every post liked by blog
-		// for each post, compare latest tracking info to last hour's tracking info
-		// return limit number of posts with highest like difference in the past hour
-		
-		sql.getPostsByBlogname(blogname, limit, order, function(queryResult, postsJson) {
-			if (queryResult) {
-				var url = queryResult["url"],
-					text = queryResult["text"],
-					image = queryResult["image"],
-					date = queryResult["date"];
-					
-				postsJson["trending"].push(
-					{"url": url,
-					"text": text,
-					"image": image,
-					"date": date,
-					"last_track": "",
-					"last_count": 0,
-					"tracking": []});
-					
-				sql.getLatestPostStats(queryResult["postID"], function(latestStats, postsJson) {
-					if (latestStats) {
-						postsJson["last_track"] = new Date(latestStats["time"]);
-						postsJson["last_count"] = latestStats["count"];
-					}
-				}, postsJson);
-					
-				sql.getPostStats(queryResult["postID"], function(statsRow) {
-					if (statsRow) {
-						var timestamp = new Date(statsRow["time"]),
-							sequence = statsRow["sequence"],
-							increment = statsRow["increment"];
-							console.log(postsJson);
-						postsJson["trending"]["tracking"].push(
-							{"timestamp": timestamp,
-							"sequence": sequence,
-							"increment": increment});
-					}
-				}, postsJson);
-			}
-			
-		}, postsJson);
-	}
-	else {
-		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
-	}
-		
-	res.json(postsJson);
-}
-
-/* Helper function for getTrends; takes care of Trending order! */
-function getJsonTrends(jsonVar, order, limit, callback) {
-
-	// Get the most recent posts by limit
-	sql.getPosts(order, limit, function(postResult) {
-		
-		var counter = 0,
-			postLength = postResult.length;
-
-		// For every post, get the tracking information
-		async.eachSeries(postResult, function (postRow, done) {
-
-			var tracking = [];
-			// Get the tracking information for the post
-			sql.getTrackingInfo(postRow.postID, limit, function(trackResult) {
-
-				var last_count,
-					last_track,
-					lengthTrack = trackResult.length;
-
-				// Get all tracking information for the post and put under "tracking"
-				// (to be added to JSON after all compiled together)
-				for (var i=0; i < lengthTrack; i++)
-				{
-					tracking.push ({
-						"timestamp": convTime(trackResult[i].time),
-						"sequence": trackResult[i].sequence,
-						"increment": trackResult[i].increment,
-						"count": trackResult[i].count
-					});
-					
-					// Get the last count (since sorted by descending, i should be 0)
-					if (i == 0)
-					{
-						last_count = trackResult[i].count;
-						last_track = convTime(trackResult[i].time);
-					}
-
-					// At the last iteration, push the tracking information into the JSON
-					if (i == (lengthTrack - 1))
-					{
-						// Put together the JSON
-						jsonVar["trending"].push({
-							"url": postRow.url,	
-							"text": postRow.text,
-							"image": postRow.image,
-							"date": convTime(postRow.date),
-							"last_track": last_track,
-							"last_count": last_count,
-							"tracking": tracking
-						});	
-
-						// When recorded the last post, return the JSON variable
-						counter++;
-						if (counter == postLength)
-						{
-							done();
-							callback(jsonVar);
-						}
-					}
-				}	
-				// Callback for every iteration
-				done();
-			});
-		});	
-	});	
-}
-
 /*return the json of trends tracked by every blog.
  * host - /blogs/trends
  * method type: get
- * sends: {limit:(optional), order:"Trending"| "Recent"}
+ * sends: {limit:(optional), order:"Trending" | "Recent"}
  * receive: see csc309 webpage
  */
 function getTrends(req, res){
 
 	var order = req.query.order,
-		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
-		jsonVar = {"trending": [], "order": order, "limit": limit};
+		limit = req.query.limit ? req.query.limit : 10; // default limit to 10 since optional
 
 	// If order is a valid input, get the trends
 	if (order == "Trending" || order == "Recent"){
-		getJsonTrends(jsonVar, order, limit, function(jsonObj) {
-			res.json(jsonObj);
+		sql.getPosts(order, limit, function(posts) {
+			getTrackingInfo(posts, function(trending) {
+				res.json({"trending": trending, "order": order, "limit": limit});
+			});
 		});
-	// Else, return error
 	} else {
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
 	}
 }
 
+/*return the json of trends tracked by blog
+ * host - /blog/{base-hostname}/trends
+ * method type: get
+ * sends: {limit:(optional), order:"Trending" | "Recent"}
+ * receive: see csc309 webpage
+ */ 
+
+function getBlogTrends(req, res){
+	var order = req.query.order,
+		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
+		blogname = req.params.blogname;
+
+	// If order is a valid input, get the trends
+	if (order == "Trending" || order == "Recent"){
+		sql.getPostsLikedBy(blogname, order, limit, function(posts) {
+			getTrackingInfo(posts, function(trending) {
+				res.json({"trending": trending, "order": order, "limit": limit});
+			});
+		});
+	} else {
+		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
+	}
+}
+
+/*
+ */
+function getTrackingInfo(posts, callback) {
+	async.map(posts, function(post, donePost) {
+		sql.getTrackingInfo(post.postID, function(trackingInfo) {
+			delete post.postID;
+			if (!post.text) delete post.text;
+			if (!post.image) delete post.image;
+			
+			var latest_tracking = trackingInfo[0];
+			post.last_track = latest_tracking.timestamp;
+			post.last_count = latest_tracking.count;
+			post.tracking = trackingInfo;
+			donePost(null, post);
+		});
+	}, function(err, posts) {
+		callback(posts);
+	});
+}
+
+/*******************Misc/Helper functions*****************************/
+
+//Create table if database is not set up, else restart tracking on previously tracked blogs. 
+function serverStart(){
+	sql.init(function(blogname){
+		setInterval(updateBlog, HOUR, blogname);
+		console.log("tracking " + blogname);
+	});
+}
 /***********************Starting the app*******************************/
 
 // Simple logging middleware for development
