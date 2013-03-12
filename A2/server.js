@@ -156,8 +156,8 @@ function getBlogTrends(req, res){
 }
 
 /* Helper function for getTrends; takes care of Trending order! */
-function getJsonTrends(res, jsonVar, order, limit, callback)
-{
+function getJsonTrends(res, jsonVar, order, limit, callback) {
+
 	// Get the most recent posts by limit
 	sql.getPosts(order, limit, function(postResult) {
 		
@@ -166,7 +166,7 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 
 		// For every post, get the tracking information
 		async.eachSeries(postResult, function (postRow, done) {
-			console.log("URL: " + postRow.url);
+
 			var tracking = [];
 			// Get the tracking information for the post
 			sql.getTrackingInfo(postRow.postID, limit, function(trackResult) {
@@ -193,6 +193,7 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 						last_track = convTime(trackResult[i].time);
 					}
 
+					// At the last iteration, push the tracking information into the JSON
 					if (i == (lengthTrack - 1))
 					{
 						// Put together the JSON
@@ -206,6 +207,7 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 							"tracking": tracking
 						});	
 
+						// When recorded the last post, return the JSON variable
 						counter++;
 						if (counter == postLength)
 						{
@@ -214,6 +216,7 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 						}
 					}
 				}	
+				// Callback for every iteration
 				done();
 			});
 		});	
@@ -227,20 +230,20 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
  * receive: see csc309 webpage
  */
 function getTrends(req, res){
-	//TODO: Well, basically everything.
+
 	var order = req.query.order,
 		limit = req.query.limit ? req.query.limit : 10, // default limit to 10 since optional
 		jsonVar = {"trending": [], "order": order, "limit": limit};
 
+	// If order is a valid input, get the trends
 	if (order == "Trending" || order == "Recent"){
 		getJsonTrends(res, jsonVar, order, limit, function(jsonObj) {
 			res.json(jsonObj);
 		});
+	// Else, return error
 	} else {
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
 	}
-	
-	//res.json(jsonVar);
 }
 
 //Create table if database is not set up, else restart tracking on previously tracked blogs. 

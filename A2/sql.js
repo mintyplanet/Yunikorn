@@ -157,11 +157,10 @@ exports.getPosts = function(order, limit, callback) {
 	{
 		db.all("SELECT * FROM post ORDER BY date DESC LIMIT ?", [limit],
 			logIfError(function(rows){
-				console.log ("ORDER: " + order + " LIMIT: " + limit);
-				rows.forEach(function (row) {
-				    console.log("Returned row: " + row.url + " and date: " + row.date
-					+ " and inc: " + row.latest_increment);
-				});
+				//rows.forEach(function (row) {
+				//    console.log("Returned row: " + row.url + " and date: " + row.date
+				//	+ " and inc: " + row.latest_increment);
+				//});
 				
 				callback(rows);
 			})
@@ -171,11 +170,10 @@ exports.getPosts = function(order, limit, callback) {
 	{
 		db.all("SELECT * FROM post ORDER BY latest_increment DESC LIMIT ?", [limit],
 			logIfError(function(rows){
-				console.log ("ORDER: " + order + " LIMIT: " + limit);
-				rows.forEach(function (row) {
-				    console.log("Returned row: " + row.url + " and date: " + row.date
-					+ " and inc: " + row.latest_increment);
-				});
+				//rows.forEach(function (row) {
+				//    console.log("Returned row: " + row.url + " and date: " + row.date
+				//	+ " and inc: " + row.latest_increment);
+				//});
 				
 				callback(rows);
 			})
