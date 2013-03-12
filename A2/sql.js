@@ -1,7 +1,7 @@
 //sqlite3 database
 var sqlite3 = require('sqlite3').verbose();
 //database is in memory for now for developing purpose
-var db = new sqlite3.Database('./sqlite.db');//./dbLog
+var db = new sqlite3.Database('./sqlite.db');//
 var util = require('util');
 
 var ORDERBY = {Recent:'date', Trending:'latest_increment'};
@@ -99,28 +99,53 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 /* Get posts liked by blogname. Order by order, Limit to limit records
  */
 exports.getPostsLikedBy = function(blogname, order, limit, callback) {
-	db.all("SELECT distinct postID, url, text, image, \
-	strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date \
-	FROM post NATURAL JOIN tracking WHERE hostname = ? ORDER BY ? DESC LIMIT ?", 
-			[blogname, ORDERBY[order], limit],
-			function(error, row) {
-				callback(row);
-			}
-	);
+
+	// SQL really hates it when you use parameters in place of column names; have hardcode it
+	// Recent = order by date, Trending = order by latest_increment
+	if (order == "Recent") {
+		db.all("SELECT distinct postID, url, text, image, \
+		strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date \
+		FROM post NATURAL JOIN tracking WHERE hostname = ? ORDER BY date DESC LIMIT ?", 
+				[blogname, limit],
+				function(error, row) {
+					callback(row);
+				}
+		);
+	} else if (order == "Trending") {
+		db.all("SELECT distinct postID, url, text, image, \
+		strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date \
+		FROM post NATURAL JOIN tracking WHERE hostname = ? ORDER BY latest_increment DESC LIMIT ?", 
+				[blogname, limit],
+				function(error, row) {
+					callback(row);
+				}
+		);
+	}
 }
 
 /* Gets the most recent posts in the database, limited by limit
  */
 exports.getPosts = function(order, limit, callback) {
 
+	// SQL really hates it when you use parameters in place of column names; have hardcode it
 	// Recent = order by date, Trending = order by latest_increment
-	db.all("SELECT postID, url, text, image, \
-	strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date \
-	FROM post ORDER BY ? DESC LIMIT ?", [ORDERBY[order], limit],
-		logIfError(function(rows){
-			callback(rows);
-		})
-	);
+	if (order == "Recent") {
+		db.all("SELECT postID, url, text, image, \
+		strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date \
+		FROM post ORDER BY date DESC LIMIT ?", [limit],
+			logIfError(function(rows){
+				callback(rows);
+			})
+		);
+	} else if (order == "Trending") {
+		db.all("SELECT postID, url, text, image, \
+		strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date \
+		FROM post ORDER BY latest_increment DESC LIMIT ?", [limit],
+			logIfError(function(rows){
+				callback(rows);
+			})
+		);
+	}
 }
 
 /* This function is the same as getPostStats but without the json callback. 
