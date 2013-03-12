@@ -12,7 +12,7 @@ function logIfError(success){
 	};
 }
 
-/* creat tables with the following schema:
+/* create tables with the following schema:
  * post(postID(Key), url, text, image, date, latest_increment)
  * tracking(hostName(Key), postid(Key), Sequence(Key), count, time, increment)
  */
@@ -61,7 +61,7 @@ exports.registerBlog = function(postID, url, text, image, blogpubdate, blogname,
 /* 
  * check if the blog is already being tracked. Return true if it is, otherwise return false.
  */
-exports.BlogIsTracked = function(blogName, callback){
+exports.isBlogTracked = function(blogName, callback){
 	db.get("SELECT hostName FROM tracking WHERE hostName = ?", blogName, 
 		logIfError(function(row){
 			callback(row);
@@ -69,16 +69,12 @@ exports.BlogIsTracked = function(blogName, callback){
 	);
 }
 
-exports.getLatestPostStats = function(postID, callback, json){
+exports.getLatestPostStats = function(postID, callback){
 	db.get("SELECT * FROM tracking WHERE postID = ? \
 		AND sequence = (SELECT MAX(sequence) FROM tracking WHERE postID = ?)", [postID, postID],
 		function(error, row) {
 			//console.log("get latest post stats successful");
-			if (json) {
-				callback(row, json);
-			} else {
-				callback(row);
-			}
+			callback(row);
 		}
 	);
 }
@@ -110,17 +106,6 @@ exports.getPostsLikedBy = function(blogname, order, limit, callback) {
 	);
 }
 
-
-exports.getPostStats = function(postID, callback, json) {
-	db.each("SELECT * FROM tracking WHERE postID = ? ORDER BY sequence DESC",
-		postID,
-		logIfError(function(row, json){
-			callback(row, json);
-		})
-	);
-}
-
-
 /* Gets the most recent posts in the database, limited by limit
  */
 exports.getPosts = function(order, limit, callback) {
@@ -136,7 +121,6 @@ exports.getPosts = function(order, limit, callback) {
 		})
 	);
 }
-
 
 /* This function is the same as getPostStats but without the json callback. 
  * Will change it later to reduce redundancy; not sure how to user it properly atm ._.

@@ -36,7 +36,7 @@ function storeBlog(req, res, args){
 	var blogname = args["blog"];
 	
 	//checking to see if the blog is already being tracked
-	sql.BlogIsTracked(blogname, function(queryResult){
+	sql.isBlogTracked(blogname, function(queryResult){
 		if(!queryResult){
 			updateBlog(blogname, function(err){
 				if (err) {	// JSONP response was non-200
@@ -55,10 +55,13 @@ function storeBlog(req, res, args){
 
 //update blog with new counts from tumblr API
 function updateBlog(blogname, callback){
+	callback = callback || util.error; //callback is optional
 	
-	var tumReq = tumblr.liked(blogname, function(data){
-		// fetching the liked posts was successful. ok to use callback now.
-		if (callback) callback();
+	tumblr.liked(blogname, function(err, data){
+		// tumblr.liked was successful if err is null
+		if(err)	{ callback(err); return; }
+		else	{ callback(); }
+		
 		//parse thru the returned data and store into database
 		data.forEach(function(post){
 			var postID = post.id,
@@ -81,10 +84,6 @@ function updateBlog(blogname, callback){
 				}
 			});
 		});
-	});
-
-	tumReq.on('error', function(e) {
-		callback(e);
 	});
 }
 
@@ -137,22 +136,29 @@ function getBlogTrends(req, res){
 	}
 }
 
-/*
+/* Populate a list of posts with their tracking information, then pass
+ * it to callback(posts) when all posts are handled.
+ * 
  */
 function getTrackingInfo(posts, callback) {
+	//posts is a list of posts with {postID, url, text, image, date}
 	async.map(posts, function(post, donePost) {
 		sql.getTrackingInfo(post.postID, function(trackingInfo) {
+			// Delete unrequired field from post, so we can send it to
+			// the client as is.
 			delete post.postID;
 			if (!post.text) delete post.text;
 			if (!post.image) delete post.image;
-			
+			// fill in the last_track, last_count info
 			var latest_tracking = trackingInfo[0];
 			post.last_track = latest_tracking.timestamp;
 			post.last_count = latest_tracking.count;
+			// associate the trackingInfo list with its post
 			post.tracking = trackingInfo;
 			donePost(null, post);
 		});
 	}, function(err, posts) {
+		// This function is called when all posts are handled.
 		callback(posts);
 	});
 }
