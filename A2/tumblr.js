@@ -1,6 +1,5 @@
 var http = require('http'),
-	util = require('util'),
-	EventEmitter = require('events').EventEmitter;
+	util = require('util');
 
 /* GET JSON response from url and pass the parsed JSON object to the 
  * callback function */
@@ -16,26 +15,27 @@ function JSONrequest(url, callback) {
 }
 
 /* Tumblr API. Only capable of fetching liked posts */
-// See testtumblr.js for usage example
 var Tumblr = function(apikey) {
 	var apikey = apikey;
 	
+	/* Returns an array of posts that blogname liked on Tumblr.
+	 * callback(err, posts) is called when there is an error, or when
+	 * the posts are retrieved. In the latter case, err is null.
+	 */
 	this.liked = function(blogname, callback){
-		var emitter = new EventEmitter;
 		var url = util.format("http://api.tumblr.com/v2/blog/%s/likes?api_key=%s", blogname, apikey);
 		JSONrequest(url, function(data) {
 			// This takes care of JSONP status check
 			if (data.meta.status != 200) {
-				emitter.emit('error', data.meta);
+				callback(data.meta, null);
 				return;
 			}
             
 			var posts = data.response.liked_posts,
 				count = data.response.liked_count;
 			util.log(util.format("fetched %d (%d total) liked posts of %s", posts.length, count, blogname));
-			callback(posts);
+			callback(null, posts);
 		});
-		return emitter;
 	};
 }
 
