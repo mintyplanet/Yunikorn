@@ -72,14 +72,14 @@ exports.BlogIsTracked = function(blogName, callback){
 exports.getLatestPostStats = function(postID, callback, json){
 	db.get("SELECT * FROM tracking WHERE postID = ? \
 		AND sequence = (SELECT MAX(sequence) FROM tracking WHERE postID = ?)", [postID, postID],
-		logIfError(function(row, json){
+		function(error, row) {
 			//console.log("get latest post stats successful");
 			if (json) {
 				callback(row, json);
 			} else {
 				callback(row);
 			}
-		})
+		}
 	);
 }
 
@@ -101,18 +101,18 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 }
 
 exports.getPostsByBlogname = function(blogname, limit, order, callback, json) {
-	db.each("(SELECT * FROM post NATURAL JOIN tracking \
+	db.each("SELECT * FROM post NATURAL JOIN tracking \
 				WHERE hostname = ? ORDER BY ? DESC LIMIT ?", 
 			[blogname, ORDERBY[order], limit],
-			logIfError(function(row, json){
+			function(error, row) {
 				callback(row, json);
-			})
+			}
 	);
 }
 
 
 exports.getPostStats = function(postID, callback, json) {
-	db.each("(SELECT * FROM tracking WHERE postID = ?) ORDER BY sequence DESC",
+	db.each("SELECT * FROM tracking WHERE postID = ? ORDER BY sequence DESC",
 		postID,
 		logIfError(function(row, json){
 			callback(row, json);

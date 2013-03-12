@@ -147,16 +147,17 @@ function getBlogTrends(req, res){
 					
 				sql.getLatestPostStats(queryResult["postID"], function(latestStats, postsJson) {
 					if (latestStats) {
-						postsJson["last_track"] = new Date(latestStats["time"] * 1000);
+						postsJson["last_track"] = new Date(latestStats["time"]);
 						postsJson["last_count"] = latestStats["count"];
 					}
 				}, postsJson);
 					
 				sql.getPostStats(queryResult["postID"], function(statsRow) {
 					if (statsRow) {
-						var timestamp = new Date(statsRow["time"] * 1000),
+						var timestamp = new Date(statsRow["time"]),
 							sequence = statsRow["sequence"],
 							increment = statsRow["increment"];
+							console.log(postsJson);
 						postsJson["trending"]["tracking"].push(
 							{"timestamp": timestamp,
 							"sequence": sequence,
