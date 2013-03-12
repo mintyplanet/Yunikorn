@@ -8,7 +8,7 @@ var express = require('express'),
 	tumblr = new Tumblr('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69'); //OAuth Consumer Key
 
 var PORT = 31335; //Yuki's assigned port
-var HOUR = 1000*10; // in milliseconds.	Currently set to 10 seconds for productive debugging...
+var HOUR = 1000*60*5; // in milliseconds.	Currently set to 10 seconds for productive debugging...
 
 
 /*******************Misc/Helper functions*****************************/
@@ -124,12 +124,12 @@ function getBlogTrends(req, res){
 		blogname = req.params.blogname;
 		postsJson = {"trending": [], "order": order, "limit": limit};
 
-	if (order == "Trending"){
+	if (order == "Trending" || order == "Recent"){
 		// get the latest tracking info for every post liked by blog
 		// for each post, compare latest tracking info to last hour's tracking info
 		// return limit number of posts with highest like difference in the past hour
 		
-		sql.getTrendingPostsByBlog(blogname, limit, function(queryResult, postsJson) {
+		sql.getPostsByBlogname(blogname, limit, order, function(queryResult, postsJson) {
 			if (queryResult) {
 				var url = queryResult["url"],
 					text = queryResult["text"],
@@ -167,49 +167,7 @@ function getBlogTrends(req, res){
 			
 		}, postsJson);
 	}
-	if (order == "Recent"){
-		// get the most recent posts from post table up to limit
-		// for each post get the most up to date tracking info from tracking table
-
-		sql.getRecentPostsByBlog(blogname, limit, function(queryResult, postsJson) {
-			if (queryResult) {
-				var url = queryResult["url"],
-					text = queryResult["text"],
-					image = queryResult["image"],
-					date = queryResult["date"];
-					
-				postsJson["trending"].push(
-					{"url": url,
-					"text": text,
-					"image": image,
-					"date": date,
-					"last_track": "",
-					"last_count": 0,
-					"tracking": []});
-					
-				sql.getLatestPostStats(queryResult["postID"], function(latestStats, postsJson) {
-					if (latestStats) {
-						postsJson["last_track"] = new Date(latestStats["time"] * 1000);
-						postsJson["last_count"] = latestStats["count"];
-					}
-				}, postsJson);
-					
-				sql.getPostStats(queryResult["postID"], function(statsRow) {
-					if (statsRow) {
-						var timestamp = new Date(statsRow["time"] * 1000),
-							sequence = statsRow["sequence"],
-							increment = statsRow["increment"];
-						postsJson["trending"]["tracking"].push(
-							{"timestamp": timestamp,
-							"sequence": sequence,
-							"increment": increment});
-					}
-				}, postsJson);
-					
-			}
-		}, postsJson);
-		
-	} else {
+	else {
 		res.json(409, {"status": 409, "msg": "Must order by Trending or Recent"});
 	}
 		
@@ -217,7 +175,7 @@ function getBlogTrends(req, res){
 }
 
 /* Helper function for getTrends; takes care of Trending order! */
-function getJsonTrends(res, jsonVar, order, limit, callback) {
+function getJsonTrends(jsonVar, order, limit, callback) {
 
 	// Get the most recent posts by limit
 	sql.getPosts(order, limit, function(postResult) {
@@ -298,7 +256,7 @@ function getTrends(req, res){
 
 	// If order is a valid input, get the trends
 	if (order == "Trending" || order == "Recent"){
-		getJsonTrends(res, jsonVar, order, limit, function(jsonObj) {
+		getJsonTrends(jsonVar, order, limit, function(jsonObj) {
 			res.json(jsonObj);
 		});
 	// Else, return error

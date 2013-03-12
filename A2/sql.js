@@ -1,19 +1,16 @@
 //sqlite3 database
 var sqlite3 = require('sqlite3').verbose();
 //database is in memory for now for developing purpose
-var db = new sqlite3.Database(':memory:');//./dbLog
+var db = new sqlite3.Database('./sqlite.db');//./dbLog
 var util = require('util');
+
+var ORDERBY = {Recent:'date', Trending:'latest_increment'};
 
 function logIfError(success){
 	return function(err, row){
 		(err) ? util.error(err) : success(row);
 	};
 }
-
-/*
-function unixTimestamp(time){
-	return Math.round(time/1000);
-}*/
 
 /* creat tables with the following schema:
  * post(postID(Key), url, text, image, date, latest_increment)
@@ -53,7 +50,7 @@ exports.registerBlog = function(postID, url, text, image, blogpubdate, blogname,
 			})
 		);
 
-		db.run("INSERT INTO tracking VALUES (?,?,1,?,?,0)", [blogname, postID, count, new Date().getTime()],
+		db.run("INSERT INTO tracking VALUES (?,?,1,?,?,0)", [blogname, postID, count, Date.now()],
 			logIfError(function(row){
 				//console.log("inserted " + postID + " into tracking"); 
 			})
@@ -67,22 +64,9 @@ exports.registerBlog = function(postID, url, text, image, blogpubdate, blogname,
 exports.BlogIsTracked = function(blogName, callback){
 	db.get("SELECT hostName FROM tracking WHERE hostName = ?", blogName, 
 		logIfError(function(row){
-			//console.log("BlogIsTracked successful");
 			callback(row);
 		})
 	);
-}
-
-exports.showTables = function(){
-	db.serialize(function(){
-		db.each("SELECT * FROM post", 
-			logIfError(function(row){ console.log("Showing table post"); console.log(row); })
-		);
-
-		db.each("SELECT * FROM tracking", 
-		logIfError(function(row){ console.log("Showing table tracking"); console.log(row); })
-		);
-	});
 }
 
 exports.getLatestPostStats = function(postID, callback, json){
@@ -108,7 +92,7 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 			})
 		);
 
-	db.run("INSERT INTO tracking VALUES (?,?,?,?,?,?)", [blogname, postID, sequence, count, new Date().getTime(),
+	db.run("INSERT INTO tracking VALUES (?,?,?,?,?,?)", [blogname, postID, sequence, count, Date.now(),
 		latest_increment],
 		logIfError(function(row){
 			//console.log("inserted " + postID + " into tracking with increment " + latest_increment);
@@ -116,25 +100,13 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 	);
 }
 
-
-exports.getRecentPostsByBlog = function(blogname, limit, callback, json) {
-	db.each("(SELECT * FROM post NATURAL JOIN \
-		SELECT postID FROM tracking WHERE hostname = ?) ORDER BY date DESC \
-		LIMIT ?", [blogname, limit],
-		logIfError(function(row, json){
-			callback(row, json);
-		})
-	);
-}
-
-
-exports.getTrendingPostsByBlog = function(blogname, limit, callback, json) {
-	db.each("(SELECT * FROM post NATURAL JOIN \
-		SELECT postID FROM tracking WHERE hostname = ?) ORDER BY latest_increment DESC \
-		LIMIT ?", [blogname, limit],
-		logIfError(function(row, json){
-			callback(row, json);
-		})
+exports.getPostsByBlogname = function(blogname, limit, order, callback, json) {
+	db.each("(SELECT * FROM post NATURAL JOIN tracking \
+				WHERE hostname = ? ORDER BY ? DESC LIMIT ?", 
+			[blogname, ORDERBY[order], limit],
+			logIfError(function(row, json){
+				callback(row, json);
+			})
 	);
 }
 
@@ -154,32 +126,15 @@ exports.getPostStats = function(postID, callback, json) {
 exports.getPosts = function(order, limit, callback) {
 
 	// Recent = order by date, Trending = order by latest_increment
-	if (order == "Recent")
-	{
-		db.all("SELECT * FROM post ORDER BY date DESC LIMIT ?", [limit],
-			logIfError(function(rows){
-				//rows.forEach(function (row) {
-				//    console.log("Returned row: " + row.url + " and date: " + row.date
-				//	+ " and inc: " + row.latest_increment);
-				//});
-				
-				callback(rows);
-			})
-		);
-	} 
-	else if (order == "Trending")
-	{
-		db.all("SELECT * FROM post ORDER BY latest_increment DESC LIMIT ?", [limit],
-			logIfError(function(rows){
-				//rows.forEach(function (row) {
-				//    console.log("Returned row: " + row.url + " and date: " + row.date
-				//	+ " and inc: " + row.latest_increment);
-				//});
-				
-				callback(rows);
-			})
-		);
-	}
+	db.all("SELECT * FROM post ORDER BY ? DESC LIMIT ?", [ORDERBY[order], limit],
+		logIfError(function(rows){
+			//rows.forEach(function (row) {
+			//    console.log("Returned row: " + row.url + " and date: " + row.date
+			//	+ " and inc: " + row.latest_increment);
+			//});
+			callback(rows);
+		})
+	);
 }
 
 
@@ -193,4 +148,3 @@ exports.getTrackingInfo = function(postID, limit, callback) {
 		})
 	);
 }
-
