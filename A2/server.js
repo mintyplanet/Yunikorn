@@ -2,6 +2,7 @@ var express = require('express'),
 	Tumblr = require('./tumblr'),
 	util = require('util'),
 	sql = require('./sql'),
+	async = require('async'),
 	querystring = require('querystring'),
 	app = express(),
 	tumblr = new Tumblr('EzNnvqdhs5XPSAAm7ioYyxXgyFQHlIDYtqYhifb3oi5fqkQl69'); //OAuth Consumer Key
@@ -164,7 +165,7 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 			postLength = postResult.length;
 
 		// For every post, get the tracking information
-		postResult.forEach(function (postRow) {
+		async.eachSeries(postResult, function (postRow, done) {
 			console.log("URL: " + postRow.url);
 			var tracking = [];
 			// Get the tracking information for the post
@@ -208,10 +209,12 @@ function getJsonTrends(res, jsonVar, order, limit, callback)
 						counter++;
 						if (counter == postLength)
 						{
+							done();
 							callback(jsonVar);
 						}
 					}
 				}	
+				done();
 			});
 		});	
 	});	
