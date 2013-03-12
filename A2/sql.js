@@ -101,22 +101,25 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 exports.getPostsLikedBy = function(blogname, order, limit, callback) {
 	db.all("SELECT distinct postID, url, text, image, \
 	strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date \
-	FROM post NATURAL JOIN tracking WHERE hostname = ? ORDER BY ? DESC LIMIT ?", 
-			[blogname, ORDERBY[order], limit],
+	FROM post NATURAL JOIN tracking WHERE hostname = ? ORDER BY case when ?='date' then date else null end DESC, \
+	case when ?='latest_increment' then latest_increment else null end DESC LIMIT ?", 
+			[blogname, ORDERBY[order], ORDERBY[order], limit],
 			function(error, row) {
 				callback(row);
 			}
 	);
 }
 
-/* Gets the most recent posts in the database, limited by limit
+/* Gets posts in the database ordered by order, limited by limit
  */
 exports.getPosts = function(order, limit, callback) {
 
 	// Recent = order by date, Trending = order by latest_increment
 	db.all("SELECT postID, url, text, image, \
 	strftime('%Y-%m-%d %H:%M:%S EST', date/1000, 'unixepoch', 'localtime') AS date \
-	FROM post ORDER BY ? DESC LIMIT ?", [ORDERBY[order], limit],
+	FROM post ORDER BY case when ?='date' then date else null end DESC ,\
+	case when ?='latest_increment' then latest_increment else null end DESC LIMIT ?", 
+		[ORDERBY[order], ORDERBY[order] ,limit],
 		logIfError(function(rows){
 			callback(rows);
 		})
