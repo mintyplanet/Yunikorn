@@ -128,7 +128,7 @@ exports.getPosts = function(order, limit, callback) {
  */
 exports.getTrackingInfo = function(postID, callback) {
 	db.all("SELECT sequence, increment, count, \
-	strftime('%Y-%m-%d %H:%M:%S EST', time/1000, 'unixepoch', 'localtime') AS timestamp, \
+	strftime('%Y-%m-%d %H:%M:%S EST', time/1000, 'unixepoch', 'localtime') AS timestamp \
 	FROM tracking WHERE postID = ? ORDER BY sequence DESC", [postID],
 		logIfError(function(rows){
 			callback(rows);
