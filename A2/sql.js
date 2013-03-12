@@ -120,17 +120,18 @@ exports.createPostStat = function(postID, blogname, sequence, count, latest_incr
 exports.getRecentPostsByBlog = function(blogname, limit, callback, json) {
 	db.each("(SELECT * FROM post NATURAL JOIN \
 		SELECT postID FROM tracking WHERE hostname = ?) ORDER BY date DESC \
-		LIMIT ?"), [blogname, limit],
+		LIMIT ?", [blogname, limit],
 		logIfError(function(row, json){
 			callback(row, json);
 		})
 	);
 }
 
+
 exports.getTrendingPostsByBlog = function(blogname, limit, callback, json) {
 	db.each("(SELECT * FROM post NATURAL JOIN \
 		SELECT postID FROM tracking WHERE hostname = ?) ORDER BY latest_increment DESC \
-		LIMIT ?"), [blogname, limit],
+		LIMIT ?", [blogname, limit],
 		logIfError(function(row, json){
 			callback(row, json);
 		})

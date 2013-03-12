@@ -80,7 +80,7 @@ function getBlogTrends(req, res){
 					"text": text,
 					"image": image,
 					"date": date,
-					"last_track", "",
+					"last_track": "",
 					"last_count": 0,
 					"tracking": []});
 					
@@ -99,7 +99,7 @@ function getBlogTrends(req, res){
 						postsJson["trending"]["tracking"].push(
 							{"timestamp": timestamp,
 							"sequence": sequence,
-							"increment", increment});
+							"increment": increment});
 					}
 				}, postsJson);
 			}
@@ -141,7 +141,7 @@ function getBlogTrends(req, res){
 						postsJson["trending"]["tracking"].push(
 							{"timestamp": timestamp,
 							"sequence": sequence,
-							"increment", increment});
+							"increment": increment});
 					}
 				}, postsJson);
 					
