@@ -1,7 +1,7 @@
 //sqlite3 database
 var sqlite3 = require('sqlite3').verbose();
 //database is in memory for now for developing purpose
-var db = new sqlite3.Database('./dbLog');//:memory:
+var db = new sqlite3.Database(':memory:');//./dbLog
 var util = require('util');
 
 function logIfError(success){
