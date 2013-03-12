@@ -50,5 +50,4 @@ How to run:
 -------------------
 Run `node server.js`  
 It will print the address and port that the server is listening to. (Default 127.0.0.1:31335)  
-Direct your frontend web application to this address.  
-Alternatively, use 
+
