@@ -44,10 +44,12 @@ API Documentation:
 Installation:
 ---------------
 We assume that you have nodeJS installed, and npm is in your path.  
-Run `npm install` in this directory to install dependencies(express, sqlite3).
+Run `npm install` in this directory to install dependencies(express, sqlite3, async).
 
 How to run:
 -------------------
 Run `node server.js`  
 It will print the address and port that the server is listening to. (Default 127.0.0.1:31335)  
+
+The server is currently running on greywolf.cdf.toronto.edu:31335  
 
