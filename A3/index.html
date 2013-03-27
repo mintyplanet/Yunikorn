@@ -26,9 +26,34 @@
 	<body>
 		<div data-role="page" data-theme="a">
 			<div data-role="header" data-position="inline">
-				<h1>It Worked!</h1>
+				<a data-role="button" href="#NEXT" data-icon="arrow-r" data-iconpos="right" class="ui-btn-right">
+				Next
+				</a>
+				<a data-role="button" href="#PREVIOUS" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">
+				Previous
+				</a>
+				<h1>FavBrowser</h1>
 			</div>
 			<div data-role="content" data-theme="a">
+				<ul data-role="listview" data-divider-theme="f" data-inset="true">
+					<li data-role="list-divider" role="heading">
+						Divider
+					</li>
+					<li data-theme="c">
+						<a href="#" data-transition="slide">
+							<img src="">
+							<h3><span class="user">user</span>&nbsp;&nbsp;(<span class="username">username</span>)</h3>
+							<span class="text">Text text .............</span>
+						</a>
+					</li>
+					<li data-theme="c">
+						<a href="#" data-transition="slide">
+							<img src="">
+							<h3><span class="user">user</span>&nbsp;&nbsp;(<span class="username">username</span>)</h3>
+							<span class="text">Text text .............</span>
+						</a>
+					</li>
+				</ul>
 				<p>Your theme was successfully downloaded. You can use this page as a reference for how to link it up!</p>
 				<pre>
 <strong>&lt;link rel=&quot;stylesheet&quot; href=&quot;themes/greyblue-theme.min.css&quot; /&gt;</strong>
