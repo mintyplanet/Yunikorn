@@ -1,3 +1,8 @@
+#main_content {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 li.white_divider {
 	height: 3px;
 }
@@ -16,12 +21,13 @@ li.white_divider {
 }
 
 .tweet_text {
-	font-size: 0.8em;
+	font-size: 0.7em;
 	position: absolute;
-	top: 35px;
+	top: 32px;
 	text-shadow: none;
 	width: 70%;
 	height: 40px;
 	overflow: auto; 
 	white-space: normal;
+	font-family: Helvetica, Arial, sans-serif;
 }
