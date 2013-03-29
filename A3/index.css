@@ -1,0 +1,27 @@
+li.white_divider {
+	height: 3px;
+}
+
+.userpic {
+	width: 70px;
+	position: absolute !important;
+	top: 5px !important;
+	left: 9px !important;
+}
+
+.user_info {
+	position: absolute;
+	top: -1px;
+	
+}
+
+.tweet_text {
+	font-size: 0.8em;
+	position: absolute;
+	top: 35px;
+	text-shadow: none;
+	width: 70%;
+	height: 40px;
+	overflow: auto; 
+	white-space: normal;
+}
