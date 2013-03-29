@@ -29,20 +29,20 @@
 	<body>
 		<div data-role="page" data-theme="a">
 			<div data-role="header" data-position="inline">
-				<a data-role="button" href="#NEXT" data-icon="arrow-r" data-iconpos="right" class="ui-btn-right">
+				<a data-role="button" href="#NEXT" data-icon="arrow-r" data-iconpos="right" class="narrowview ui-btn-right">
 				Next
 				</a>
-				<a data-role="button" href="#PREVIOUS" data-icon="arrow-l" data-iconpos="left" class="ui-btn-left">
+				<a data-role="button" href="#PREVIOUS" data-icon="arrow-l" data-iconpos="left" class="narrowview ui-btn-left">
 				Previous
 				</a>
 				<h1>FavBrowser</h1>
 			</div>
-			<div data-role="content" data-theme="a">
+			<div data-role="content" data-theme="a" id="main_content">
 				<ul data-role="listview" data-divider-theme="f" data-inset="true">
 					<li data-role="list-divider" role="heading" class="white_divider">
 						&nbsp;
 					</li>
-					<li data-theme="c">
+					<li data-theme="c" class="tweet">
 						<a href="#" data-transition="slide">
 							<img class="userpic" src="images/hostile_goose_userpic.png">
 							<h3 class="user_info"><span class="user">goose</span>&nbsp;&nbsp;(<span class="username">@hostile_goose</span>)</h3>
@@ -52,7 +52,7 @@
 					<li data-role="list-divider" role="heading" class="white_divider">
 						&nbsp;
 					</li>
-					<li data-theme="c">
+					<li data-theme="c" class="tweet">
 						<a href="#" data-transition="slide">
 							<img class="userpic" src="images/stats_canada_userpic.png">
 							<h3 class="user_info"><span class="user">Stats Canada</span>&nbsp;&nbsp;(<span class="username">@stats_canada</span>)</h3>
