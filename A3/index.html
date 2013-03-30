@@ -29,10 +29,10 @@
 	<body>
 		<div data-role="page" data-theme="a">
 			<div data-role="header" data-position="inline">
-				<a data-role="button" href="#NEXT" data-icon="arrow-r" data-iconpos="right" class="narrowview ui-btn-right">
+				<a data-role="button" href="#NEXT" data-icon="arrow-r" data-iconpos="right" id='right-btn' class="narrowview ui-btn-right">
 				Next
 				</a>
-				<a data-role="button" href="#PREVIOUS" data-icon="arrow-l" data-iconpos="left" class="narrowview ui-btn-left">
+				<a data-role="button" href="#PREVIOUS" data-icon="arrow-l" data-iconpos="left" id='left-btn' class="narrowview ui-btn-left">
 				Previous
 				</a>
 				<h1>FavBrowser</h1>
@@ -48,26 +48,15 @@
 				&nbsp;
 				</div>
 			</a>
+			
 			<div data-role="content" data-theme="a" class="tweet_content">
-				<ul data-role="listview" data-divider-theme="f" data-inset="true" class="tweet_list">
-					<li data-role="list-divider" role="heading" class="white_divider">
-						&nbsp;
-					</li>
-					<li data-theme="c" class="tweet">
+				<ul id="feeds" data-role="listview" data-divider-theme="f" data-inset="true" class="tweet_list">
+					
+					<li data-theme="c" class="tweet-template" style="display:none">
 						<a href="#" data-transition="slide">
-							<img class="userpic" src="images/hostile_goose_userpic.png">
-							<h3 class="user_info"><span class="user">goose</span>&nbsp;&nbsp;(<span class="username">@hostile_goose</span>)</h3>
-							<div class="tweet_text">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in.</div>
-						</a>
-					</li>
-					<li data-role="list-divider" role="heading" class="white_divider">
-						&nbsp;
-					</li>
-					<li data-theme="c" class="tweet">
-						<a href="#" data-transition="slide">
-							<img class="userpic" src="images/stats_canada_userpic.png">
-							<h3 class="user_info"><span class="user">Stats Canada</span>&nbsp;&nbsp;(<span class="username">@stats_canada</span>)</h3>
-							<div class="tweet_text">Text text .............</div>
+							<img class="userpic" src="">
+							<h3 class="user_info"><span class="user">username</span>&nbsp;&nbsp;(<span class="username">@user_tag</span>)</h3>
+							<div class="tweet_text">text</div>
 						</a>
 					</li>
 				</ul>
