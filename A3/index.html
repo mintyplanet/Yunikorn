@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    
-    <link href="index.css" rel="stylesheet">
 
     <!-- importing css, reset.css is to reduce the differences between different browsers.-->
 	<link rel="stylesheet" href="themes/greyblue-theme.css" />	
@@ -19,6 +17,8 @@
 	only works if I use directly from the jquery website
 	check if we downloaded the right version??-->
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile.structure-1.3.0.min.css" />
+    <link href="index.css" rel="stylesheet">
+    
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>
 	
@@ -37,8 +37,19 @@
 				</a>
 				<h1>FavBrowser</h1>
 			</div>
-			<div data-role="content" data-theme="a" id="main_content">
-				<ul data-role="listview" data-divider-theme="f" data-inset="true">
+			<div id="main_content">
+			<a href="#NEXT" data-icon="arrow-r" class="wideview">
+				<div class="right_arrow">
+				&nbsp;
+				</div>
+			</a>
+			<a href="#PREVIOUS" data-icon="arrow-l" class="wideview">
+				<div class="left_arrow">
+				&nbsp;
+				</div>
+			</a>
+			<div data-role="content" data-theme="a" class="tweet_content">
+				<ul data-role="listview" data-divider-theme="f" data-inset="true" class="tweet_list">
 					<li data-role="list-divider" role="heading" class="white_divider">
 						&nbsp;
 					</li>
@@ -60,6 +71,7 @@
 						</a>
 					</li>
 				</ul>
+			</div>
 			</div>
 		</div>
 	</body>
