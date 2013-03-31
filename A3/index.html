@@ -1,33 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>CSC309 Assignment 3</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+	<head>
+		<meta charset="utf-8">
+		<title>CSC309 Assignment 3</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="">
+		<meta name="author" content="">
 
-    <!-- importing css, reset.css is to reduce the differences between different browsers.-->
-	<link rel="stylesheet" href="themes/greyblue-theme.css" />	
-	
-	<link href="reset.css" rel="stylesheet">
-
-	
-	<!-- for some reason our downloaded jQuery files are not working
-	only works if I use directly from the jquery website
-	check if we downloaded the right version??-->
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile.structure-1.3.0.min.css" />
-    <link href="index.css" rel="stylesheet">
-    
-	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>
-	
-	<script src="jquery.js"></script>
-    <script src="index.js"></script>
+		<!-- importing css, reset.css is to reduce the differences between different browsers.-->
+		<link rel="stylesheet" href="reset.css">
+		<link rel="stylesheet" href="jquery.mobile-1.3.0.css">
+		<link rel="stylesheet" href="themes/greyblue-theme.css">	
+		<link rel="stylesheet" href="index.css">
+		
+		<script src="jquery.js"></script>
+		<script src="jquery.mobile-1.3.0.js"></script>
+		<script src="index.js"></script>
 	</head>
 
 	<body>
-		<div data-role="page" data-theme="a">
+		<div data-role="page" data-theme="a" id="home-page">
 			<div data-role="header" data-position="inline">
 				<a data-role="button" href="#NEXT" data-icon="arrow-r" data-iconpos="right" id='right-btn' class="narrowview ui-btn-right">
 				Next
@@ -37,31 +29,36 @@
 				</a>
 				<h1>FavBrowser</h1>
 			</div>
-			<div id="main_content">
-			<a href="#NEXT" data-icon="arrow-r" class="wideview">
-				<div class="right_arrow">
-				&nbsp;
-				</div>
-			</a>
-			<a href="#PREVIOUS" data-icon="arrow-l" class="wideview">
-				<div class="left_arrow">
-				&nbsp;
-				</div>
-			</a>
 			
-			<div data-role="content" data-theme="a" class="tweet_content">
-				<ul id="feeds" data-role="listview" data-divider-theme="f" data-inset="true" class="tweet_list">
-					
-					<li data-theme="c" class="tweet-template" style="display:none">
+			<div data-role="content" data-theme="a" class="tweet-content">
+				<ul id="feeds" data-role="listview" data-divider-theme="f" data-inset="true" class="tweet-list">
+					<!-- The template for each individual tweet-->
+					<li data-theme="c" id="tweet-template" style="display:none">
 						<a href="#" data-transition="slide">
 							<img class="userpic" src="">
 							<h3 class="user_info"><span class="user">username</span>&nbsp;&nbsp;(<span class="username">@user_tag</span>)</h3>
 							<div class="tweet_text">text</div>
 						</a>
 					</li>
+					<!-- end template -->
 				</ul>
 			</div>
+		</div>
+		
+		
+		
+		<div data-role="page" data-theme="a" id="tweet-page">
+			<div data-role="content">
+				<h2>Tweet</h2>
 			</div>
 		</div>
+		<div data-role="page" data-theme="a" id="user-page">
+			<div data-role="content">
+				<h2>Tweet</h2>
+			</div>
+		</div>
+		
+		
+	
 	</body>
 </html>
