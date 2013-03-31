@@ -1,3 +1,40 @@
+/* Mobile or narrow screen ----------- */
+@media only screen 
+and (max-width : 768px) {
+.narrowview {
+	display: block !important;
+}
+.wideview {
+	display: none !important;
+}
+#feeds.tweet-list {
+	width:90%;
+}
+}
+
+
+/* Desktops, laptops, tablets, ... ----------- */
+@media only screen 
+and (min-width : 769px) {
+
+#right-btn, #left-btn{
+	position: fixed;
+	top: 40%; /* Kinda lame...*/
+}
+
+.narrowview {
+	display: block !important;
+}
+
+.wideview {
+	display: block !important;
+}
+#feeds.tweet-list {
+	width:80%;
+}
+}
+
+
 #main_content {
 	margin-left: auto;
 	margin-right: auto;
@@ -10,8 +47,10 @@
 	padding: 0px;
 }
 
-.tweet_list {
+#feeds.tweet-list {
 	padding: 0px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .right_arrow {

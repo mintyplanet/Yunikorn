@@ -35,7 +35,7 @@ function displayContent(){
 		}
 		
 		user = tweet.user;
-		li = $('#feeds li.tweet-template').clone();
+		li = $('#tweet-template').clone();
 		li.removeAttr('style').removeClass('tweet-template').addClass('tweet');
 		// manipulate its contents
 		li.find('.userpic').attr('src', user.profile_image_url);
@@ -81,7 +81,8 @@ function prevPage(){
  * remove current contents.
  */
 function removeContent(){
-	$('#feeds').remove('.tweet');
+	//$('#feeds').remove('.tweet');
+	$('.tweet,.endOfTweet').remove(); // Kevin, the above line didn't work.
 }
 
 /*
@@ -93,63 +94,18 @@ function removeContent(){
  
  //called when the DOM is first loaded.
  $(document).ready(function(){
-	init();
 	displayContent();
-});
 
-//called when next page or prev page is clicked
-$("#right-btn").click(function(){ 
-	nextPage();
-	console.log('clicked');
-});
-$("#left-btn").bind('click', function(){
-	prevPage();
-});
+	/* Make sure you bind events after the document has loaded. i.e. here */
 
-$(window).resize(function(){
-	var width = $(window).width();
-	var height = $(document).height();
-	modHeight = height - 100;
-	widthDiff = 700;
-	if (width < widthDiff) {
-		$("#main_content").width("95%");
-		$(".narrowview").show();
-		$(".wideview").hide();
-	} else {
-		$("#main_content").width("70%");
-		$(".wideview").show();
-		$(".narrowview").hide();
-	}
-	
-	$("#main_content").height(modHeight);
-});
+	//called when next page or prev page is clicked
+	$("#right-btn").click(function(){ 
+		nextPage();
+		console.log('clicked');
+	});
+	$("#left-btn").click(function(){
+		prevPage();
+	});
 
 
-function init(){
-	var width = $(window).width();
-	var height = $(document).height();
-	modHeight = height - 100;
-	widthDiff = 700;
-	
-	if (width < widthDiff) {
-		$("#main_content").width("95%");
-		$(".narrowview").show();
-		$(".wideview").hide();		
-	} else {
-		$("#main_content").width("70%");
-		$(".wideview").show();
-		$(".narrowview").hide();
-		$(".left_arrow").position({
-			my: "right",
-			at: "left",
-			of: ".tweet_content"
-		});
-		$(".right_arrow").position({
-			my: "left",
-			at: "right",
-			of: ".tweet_content"
-		});
-	}
-	
-	$("#main_content").height(modHeight);
-}
+});
