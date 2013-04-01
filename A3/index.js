@@ -12,6 +12,7 @@ $.ajax({
 	dataType :"json",
 	url: "favs.json",
 	async: false,
+	mimeType: "application/json",
 	success: function(data){ 
 		//console.log(data);
 		favs = data; 
