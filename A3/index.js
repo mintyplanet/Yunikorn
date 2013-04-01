@@ -7,16 +7,18 @@ var DisplayNum = 2,
 	moreData = true,
 	favs;
 
-
 //load the local json file
 $.ajax({
+	dataType :"json",
 	url: "favs.json",
 	async: false,
 	success: function(data){ 
-		 favs = $.parseJSON(data); 
+		//console.log(data);
+		favs = data; 
 	} 
 });
 
+//console.log(favs);
 /*
  * Display content based on offset value.
  */
@@ -85,7 +87,7 @@ function removeContent(){
 	$('.tweet,.endOfTweet').remove(); // Kevin, the above line didn't work.
 }
 
-/*
+ /*
  *-----------------------------------------------------------------------------------------------------------
  * Events ---------------------------------------------------------------------------------------------------
  *-----------------------------------------------------------------------------------------------------------	
@@ -101,7 +103,7 @@ function removeContent(){
 	//called when next page or prev page is clicked
 	$("#right-btn").click(function(){ 
 		nextPage();
-		console.log('clicked');
+		//console.log('clicked');
 	});
 	$("#left-btn").click(function(){
 		prevPage();
