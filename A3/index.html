@@ -34,11 +34,25 @@
 				<ul id="feeds" data-role="listview" data-divider-theme="f" data-inset="true" class="tweet-list">
 					<!-- The template for each individual tweet-->
 					<li data-theme="c" id="tweet-template" style="display:none">
-						<a href="#" data-transition="slide">
+						<a href="#popupDialog" data-rel="popup" data-position-to="window" data-inline="true" data-transition="pop">
 							<img class="userpic" src=""/>
 							<h3 class="user_info"><span class="user">username</span>&nbsp;&nbsp;(<span class="username">@user_tag</span>)</h3>
 							<div class="tweet_text">text</div>
+							
+							
 						</a>
+						<!-- Pop-up info -->
+						<div data-role="popup" id="popupDialog" data-overlay-theme="a" data-dismissible="false" style="max-width:400px;"> 
+				    			<div data-role="header" class="tweet-head">
+								<h2 class="tweet-full-text">Tweet</h2>
+				    			</div>
+							<div data-role="content" class="tweet-full">
+								<p class="date">date</p>
+								<p class="retweet-count">count</p>
+								<img class="expanded-image" src=""/>
+								<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">OK</a>
+							</div>
+						</div>
 					</li>
 					<!-- end template -->
 				</ul>
