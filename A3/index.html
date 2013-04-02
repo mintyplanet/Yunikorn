@@ -19,12 +19,12 @@
 	</head>
 
 	<body>
-		<div data-role="page" data-theme="a" id="home-page">
+		<div data-role="page" data-theme="a">
 			<div data-role="header" data-position="inline">
-				<a data-role="button" href="#NEXT" data-icon="arrow-r" data-iconpos="right" id='right-btn' class="narrowview ui-btn-right">
-				Next
+				<a data-role="button" href="#NEXT" data-icon="arrow-r" data-iconpos="right" id='right-btn' class="ui-btn-right">
+				 Next
 				</a>
-				<a data-role="button" href="#PREVIOUS" data-icon="arrow-l" data-iconpos="left" id='left-btn' class="narrowview ui-btn-left">
+				<a data-role="button" href="#PREVIOUS" data-icon="arrow-l" data-iconpos="left" id='left-btn' class="ui-btn-left">
 				Previous
 				</a>
 				<h1>FavBrowser</h1>
@@ -34,48 +34,36 @@
 				<ul id="feeds" data-role="listview" data-divider-theme="f" data-inset="true" class="tweet-list">
 					<!-- The template for each individual tweet-->
 					<li data-theme="c" id="tweet-template" style="display:none">
-						<!-- <a href="#popupDialog" data-rel="popup" data-position-to="window" data-inline="true" data-transition="pop"> -->
-						<a href="#" data-transition="slide">
+						<a class="tweet_details" href="#tweetDialog" data-rel="dialog"  data-transition="pop">
 							<img class="userpic" src=""/>
 							<h3 class="user_info"><span class="user">username</span>&nbsp;&nbsp;(<span class="username">@user_tag</span>)</h3>
 							<div class="tweet_text">text</div>
 						</a>
-
-						<!-- Pop-up tweet info
-						<div data-role="popup" id="popupDialog" data-overlay-theme="a" data-dismissible="false" style="max-width:400px;"> 
-				    			<div data-role="header" class="tweet-head">
-								<h2 class="tweet-full-text">Tweet</h2>
-				    			</div>
-							<div data-role="content" class="tweet-full">
-								<p class="date">date</p>
-								<p class="retweet-count">count</p>
-								<img class="expanded-image" src=""/>
-								<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">OK</a>
-							</div>
-						</div> -->
-
-						
 					</li>
 					<!-- end template -->
 				</ul>
 			</div>
 		</div>
 		
+		<!-- Tweet info popup template-->
+		<div data-role="dialog" id="tweetDialog" data-overlay-theme="c" > 
+			<div data-role="header" class="tweet-head">
+				<h2>Tweet Details</h2>
+			</div>
+			<div data-role="content" class="tweet-full">
+				<img class="expanded-image" src=""/>
+				<p class="tweet-full-text"></p>
+				<p>Tweeted at <span class="date"></span></p>
+				<p><span class="retweet-count"></span> Retweets</p>
+				<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">OK</a>
+			</div>
+		</div>
+		<!--
 		<div id="Popupbox">
 		    this is the popup box 
 		</div>
-
-		<div data-role="page" data-theme="a" id="tweet-page">
-			<div data-role="content">
-				<h2>Tweet</h2>
-			</div>
-		</div>
-		<div data-role="page" data-theme="a" id="user-page">
-			<div data-role="content">
-				<h2>Tweet</h2>
-			</div>
-		</div>
-		
+		-->
+		<!-- End Tweet info popup -->
 		
 	
 	</body>

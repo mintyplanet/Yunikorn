@@ -41,19 +41,29 @@ function displayContent(){
 		li = $('#tweet-template').clone();
 		li.removeAttr('style').removeClass('tweet-template').addClass('tweet');
 		// manipulate its contents
+		
 		li.find('.userpic').attr('src', user.profile_image_url);
 		li.find('.user').text(user.name);
 		li.find('.username').text('@' + user.screen_name);
 		li.find('.tweet_text').text(tweet.text);
 		
-			//console.log("doing something: " + li.closest('.tweet-full-text').get(0).innerHTML);
-			//$(this).text(tweet.text);
-
+		li.find('.tweet_details').click(tweet, populateTweetDialog);
 		li.appendTo('#feeds');
 		
 		//map userID to user
 		userDict[user.screen_name] = user;
 	}
+}
+
+function populateTweetDialog(e) {
+	var dialog = $("div#tweetDialog"),
+		tweet = e.data,
+		user = tweet.user;
+	dialog.find(".tweet-full-text").text(tweet.text);
+	dialog.find(".date").text(tweet.created_at);
+	dialog.find(".retweet-count").text(tweet.retweet_count);
+	dialog.find(".expanded-image").attr('src', user.profile_image_url);
+	
 }
 
 /*
@@ -104,6 +114,7 @@ function prevPage(){
 /*
  * remove current contents.
  */
+ 
 function removeContent(){
 	//$('#feeds').remove('.tweet');
 	$('.tweet,.endOfTweet').remove(); // Kevin, the above line didn't work.
@@ -125,22 +136,9 @@ function removeContent(){
 	//called when next page or prev page is clicked
 	$("#right-btn").click(function(){ 
 		nextPage();
-		//console.log('clicked');
 	});
 	$("#left-btn").click(function(){
 		prevPage();
 	});
-
-	// Called when click on user name or profile picture; displays user information
-	$(".userpic.ui-li-thumb, .user, .username").click(function(e){
-		$("#Popupbox").dialog({
-			 autoOpen: false,
-			 modal: true,
-			 draggable: true,
-			 Title: "test"});
-		$("#Popupbox").dialog("moveToTop");
-		//e.stopPropagation(); // If click on user, don't show tweet information
-	});
-
 
 });
