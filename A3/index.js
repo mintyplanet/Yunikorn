@@ -24,7 +24,7 @@ $.ajax({
  * Display content based on offset value.
  */
 function displayContent(){
-	var tweet, li, user;
+	var tweet, li, user, entities;
 
 	// loop thru the tweets and push them to the DOM
 	for(var i = offset; i < offset + DisplayNum; i++){
@@ -39,7 +39,7 @@ function displayContent(){
 		
 		user = tweet.user;
 		li = $('#tweet-template').clone();
-		li.removeAttr('style').removeClass('tweet-template').addClass('tweet');
+		li.removeAttr('style').addClass('tweet');
 		// manipulate its contents
 		
 		li.find('.userpic').attr('src', user.profile_image_url);
@@ -58,12 +58,30 @@ function displayContent(){
 function populateTweetDialog(e) {
 	var dialog = $("div#tweetDialog"),
 		tweet = e.data,
-		user = tweet.user;
+		user = tweet.user,
+		media = tweet.entities.media;
+	
 	dialog.find(".tweet-full-text").text(tweet.text);
 	dialog.find(".date").text(tweet.created_at);
 	dialog.find(".retweet-count").text(tweet.retweet_count);
 	dialog.find(".expanded-image").attr('src', user.profile_image_url);
-	
+
+	if (typeof media != "undefined" && !$(".media")[0]){
+		media.forEach(function(mediaJSON){
+			imageAnchor = dialog.find(".media-details").clone();
+			imageAnchor.click(mediaJSON, openPicDialog);
+			image = imageAnchor.find(".media-template");
+			image.removeAttr('style').removeClass("media-template").addClass("media")
+			image.attr('src', mediaJSON.media_url);
+			image.appendTo(dialog.find(".media-grid"));
+		});
+	}
+}
+
+function openPicDialog(e) {
+	var dialog = $("div#mediaDialog"),
+		image = e.data;
+	dialog.find(".large-pic").attr('src', image.media_url);
 }
 
 /*
@@ -79,23 +97,6 @@ function nextPage(){
 
 /*
  * change the offset amount and display the updated content
- */
-function prevPage(){
-	if(offset != 0){
-		//see if on last page, if so set moreData back to true
-		if(!moreData){
-			moreData = true;
-			$('#feeds').remove('.endOfTweet');
-		}
-
-		offset -= DisplayNum;
-		removeContent();
-		displayContent();
-	}
-}
-
-/*
- * Add a popup with the user information
  */
 function prevPage(){
 	if(offset != 0){

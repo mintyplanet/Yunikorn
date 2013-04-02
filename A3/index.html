@@ -57,11 +57,26 @@
 				<p class="tweet-full-text"></p>
 				<p>Tweeted at <span class="date"></span></p>
 				<p><span class="retweet-count"></span> Retweets</p>
-				<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">OK</a>
+				<div class='media-grid'>
+					<a class="media-details" href="#mediaDialog" data-rel="dialog"  data-transition="pop">
+						<img class="media-template" src="" style="display:none"/>
+					</a>
+				</div>
+				<a href="#" class="ok-btn" data-role="button" data-inline="true" data-rel="back" data-theme="c">OK</a>
 			</div>
 		</div>
-		<!-- End Tweet info popup -->
 		
+		<!-- End Tweet info popup -->
+
+		<!-- picture popup template-->
+		<div data-role="dialog" id="mediaDialog" data-overlay-theme="c">
+			<img class="large-pic" src="">
+		</div>
+		<!--
+		<div id="Popupbox">
+		    this is the popup box 
+		</div>
+		-->
 		
 		<!-- User info popup template-->
 		<div data-role="dialog" id="userDialog" data-overlay-theme="c" > 
