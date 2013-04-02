@@ -110,5 +110,11 @@ function removeContent(){
 		prevPage();
 	});
 
+	/*// Called when click on user name or profile picture; displays user information
+	$(".userpic.ui-li-thumb, .user, .username").click(function(e){
+		e.stopPropagation(); // If click on user, don't show tweet information
+		console.log('clicked user');
+	});*/
+
 
 });
