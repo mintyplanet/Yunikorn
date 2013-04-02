@@ -48,6 +48,7 @@ function displayContent(){
 		li.find('.tweet_text').text(tweet.text);
 		
 		li.find('.tweet_details').click(tweet, populateTweetDialog);
+		li.find('.user_details').click(user, populateUserDialog);
 		li.appendTo('#feeds');
 		
 		//map userID to user
@@ -71,11 +72,24 @@ function populateTweetDialog(e) {
 			imageAnchor = dialog.find(".media-details").clone();
 			imageAnchor.click(mediaJSON, openPicDialog);
 			image = imageAnchor.find(".media-template");
-			image.removeAttr('style').removeClass("media-template").addClass("media")
+			image.removeAttr('style').removeClass("media-template").addClass("media");
 			image.attr('src', mediaJSON.media_url);
 			image.appendTo(dialog.find(".media-grid"));
 		});
 	}
+}
+
+function populateUserDialog(e) {
+	var dialog = $("div#userDialog"),
+		user = e.data;
+	console.log(user);
+	dialog.find(".username").text(user.name);
+	dialog.find(".expanded-image").attr('src', user.profile_image_url);
+	dialog.find(".user_description").text(user.description);
+	dialog.find(".user_url").attr('src', user.url).text(user.url); // Link isn't activated. WHY??
+	dialog.find(".user_location").text(user.location);
+	
+	
 }
 
 function openPicDialog(e) {
