@@ -34,7 +34,6 @@ and (min-width : 641px) {
 }
 }
 
-
 #main_content {
 	margin-left: auto;
 	margin-right: auto;
@@ -101,4 +100,9 @@ li.white_divider {
 	overflow: auto; 
 	white-space: normal;
 	font-family: Helvetica, Arial, sans-serif;
+}
+
+.media{
+	width: 150px;
+	height: 150px;
 }
