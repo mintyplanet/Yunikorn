@@ -12,6 +12,7 @@ Features:
 ---------------
 * Clicking on the tweet will trigger a popup that displays the tweet in greater detail.
 * Clicking on the user name or profile picture will trigger a popup that displays information about the user.
+* Supported in Mozilla Firefox
 
 
 Design Decisions:
