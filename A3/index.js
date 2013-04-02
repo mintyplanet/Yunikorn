@@ -45,6 +45,10 @@ function displayContent(){
 		li.find('.user').text(user.name);
 		li.find('.username').text('@' + user.screen_name);
 		li.find('.tweet_text').text(tweet.text);
+		
+			//console.log("doing something: " + li.closest('.tweet-full-text').get(0).innerHTML);
+			//$(this).text(tweet.text);
+
 		li.appendTo('#feeds');
 		
 		//map userID to user
@@ -65,6 +69,23 @@ function nextPage(){
 
 /*
  * change the offset amount and display the updated content
+ */
+function prevPage(){
+	if(offset != 0){
+		//see if on last page, if so set moreData back to true
+		if(!moreData){
+			moreData = true;
+			$('#feeds').remove('.endOfTweet');
+		}
+
+		offset -= DisplayNum;
+		removeContent();
+		displayContent();
+	}
+}
+
+/*
+ * Add a popup with the user information
  */
 function prevPage(){
 	if(offset != 0){
@@ -110,11 +131,16 @@ function removeContent(){
 		prevPage();
 	});
 
-	/*// Called when click on user name or profile picture; displays user information
+	// Called when click on user name or profile picture; displays user information
 	$(".userpic.ui-li-thumb, .user, .username").click(function(e){
-		e.stopPropagation(); // If click on user, don't show tweet information
-		console.log('clicked user');
-	});*/
+		$("#Popupbox").dialog({
+			 autoOpen: false,
+			 modal: true,
+			 draggable: true,
+			 Title: "test"});
+		$("#Popupbox").dialog("moveToTop");
+		//e.stopPropagation(); // If click on user, don't show tweet information
+	});
 
 
 });
