@@ -31,14 +31,16 @@
 			</div>
 		
 			<div data-role="content" data-theme="a" class="tweet-content">
-				<ul id="feeds" data-role="listview" data-divider-theme="f" data-inset="true" class="tweet-list">
+				<ul id="feeds" data-role="listview" data-divider-theme="f" data-inset="true" data-split-icon="star" class="tweet-list">
 					<!-- The template for each individual tweet-->
 					<li data-theme="c" id="tweet-template" style="display:none">
-						<a class="tweet_details" href="#tweetDialog" data-rel="dialog"  data-transition="pop">
+						<a class="tweet_details" href="#tweetDialog" data-rel="dialog" data-transition="pop">
 							<img class="userpic" src=""/>
 							<h3 class="user_info"><span class="user">username</span>&nbsp;&nbsp;(<span class="username">@user_tag</span>)</h3>
-							<div class="tweet_text">text</div>
+							
+							<p class="tweet_text">text</p>
 						</a>
+						<a href="#userDialog" data-ref="dialog">learn more about the user</a>
 					</li>
 					<!-- end template -->
 				</ul>
@@ -58,12 +60,21 @@
 				<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">OK</a>
 			</div>
 		</div>
-		<!--
-		<div id="Popupbox">
-		    this is the popup box 
-		</div>
-		-->
 		<!-- End Tweet info popup -->
+		
+		
+		<!-- User info popup template-->
+		<div data-role="dialog" id="userDialog" data-overlay-theme="c" > 
+			<div data-role="header" class="user-head">
+				<h2>User Details</h2>
+			</div>
+			<div data-role="content" class="user-full">
+				<img class="expanded-image" src=""/>
+				<p>Some info about the user</p>
+				<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">OK</a>
+			</div>
+		</div>
+		<!-- End User info popup -->
 		
 	
 	</body>
