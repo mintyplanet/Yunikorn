@@ -24,7 +24,7 @@ $.ajax({
  * Display content based on offset value.
  */
 function displayContent(){
-	var tweet, li, user, entities;
+	var tweet, li, user, text;
 
 	// loop thru the tweets and push them to the DOM
 	for(var i = offset; i < offset + DisplayNum; i++){
@@ -36,7 +36,8 @@ function displayContent(){
 			$('#feeds').append(message);
 			break;
 		}
-		
+
+		text = replaceEntities(tweet);
 		user = tweet.user;
 		li = $('#tweet-template').clone();
 		li.removeAttr('style').addClass('tweet');
@@ -45,8 +46,9 @@ function displayContent(){
 		li.find('.userpic').attr('src', user.profile_image_url);
 		li.find('.user').text(user.name);
 		li.find('.username').text('@' + user.screen_name);
-		li.find('.tweet_text').text(tweet.text);
-		
+		//console.log(tweet.text);
+		li.find('.tweet_details').append('<p class="tweet_text">' + text +'</p>');
+
 		li.find('.tweet_details').click(tweet, populateTweetDialog);
 		li.appendTo('#feeds');
 		
@@ -59,14 +61,20 @@ function populateTweetDialog(e) {
 	var dialog = $("div#tweetDialog"),
 		tweet = e.data,
 		user = tweet.user,
-		media = tweet.entities.media;
+		media = tweet.entities.media,
+		text;
 	
-	dialog.find(".tweet-full-text").text(tweet.text);
+	text = replaceEntities(tweet);
 	dialog.find(".date").text(tweet.created_at);
 	dialog.find(".retweet-count").text(tweet.retweet_count);
 	dialog.find(".expanded-image").attr('src', user.profile_image_url);
 
-	if (typeof media != "undefined" && !$(".media")[0]){
+	if (!$(".tweet-full-text")[0]){
+		$('<p class="tweet-full-text">' + text + '</p>').insertAfter(dialog.find(".expanded-image"));
+	}
+
+	if (typeof media != 'undefined' && !$(".media")[0]){
+		console.log(media);
 		media.forEach(function(mediaJSON){
 			imageAnchor = dialog.find(".media-details").clone();
 			imageAnchor.click(mediaJSON, openPicDialog);
@@ -83,6 +91,32 @@ function openPicDialog(e) {
 		image = e.data;
 	dialog.find(".large-pic").attr('src', image.media_url);
 }
+
+function replaceEntities(tweet){
+	var urls = tweet.entities.urls,
+		media = tweet.entities.media,
+		text = tweet.text;
+
+	text = replaceLinks(text, urls);
+	text = replaceLinks(text, media);
+	return text;
+}
+
+function replaceLinks(text,entity){
+	var urlstr;
+
+	if(typeof entity != 'undefined'){
+		for(var i = 0; i < entity.length; i++){
+			urlstr = entity[i].url;
+			text = text.replace(urlstr, '<a href="' + urlstr + '">' + urlstr + '</a>');	
+		}
+	}
+	return text;
+}
+
+//--------------------------------------------------------------------------------------------------
+// pagination---------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 /*
  * change the offset amount and display the updated content
