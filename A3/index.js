@@ -102,8 +102,7 @@ function populateUserDialog(e) {
 
 function openPicDialog(e) {
 	var dialog = $("div#mediaDialog"),
-		image = e.data
-		size = image.sizes,
+		image = e.data,
 		picture = dialog.find(".large-pic").attr('src', image.media_url);
 }
 
