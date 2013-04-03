@@ -50,6 +50,7 @@ function displayContent(){
 		li.find('.tweet_details').append('<p class="tweet_text">' + text +'</p>');
 
 		li.find('.tweet_details').click(tweet, populateTweetDialog);
+		li.find('.user_details').click(user, populateUserDialog);
 		li.appendTo('#feeds');
 		
 		//map userID to user
@@ -86,6 +87,19 @@ function populateTweetDialog(e) {
 	} else {
 		image.attr('src', "");	
 	}
+}
+
+function populateUserDialog(e) {
+	var dialog = $("div#userDialog"),
+		user = e.data;
+	console.log(user);
+	dialog.find(".username").text(user.name);
+	dialog.find(".expanded-image").attr('src', user.profile_image_url);
+	dialog.find(".user_description").text(user.description);
+	dialog.find(".user_url").attr('src', user.url).text(user.url); // Link isn't activated. WHY??
+	dialog.find(".user_location").text(user.location);
+	
+	
 }
 
 function openPicDialog(e) {

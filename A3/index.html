@@ -38,7 +38,7 @@
 							<img class="userpic" src=""/>
 							<h3 class="user_info"><span class="user">username</span>&nbsp;&nbsp;(<span class="username">@user_tag</span>)</h3>
 						</a>
-						<a href="#userDialog" data-ref="dialog">learn more about the user</a>
+						<a href="#userDialog" data-ref="dialog" class="user_details">learn more about the user</a>
 					</li>
 					<!-- end template -->
 				</ul>
@@ -81,13 +81,16 @@
 				<h2>User Details</h2>
 			</div>
 			<div data-role="content" class="user-full">
+				<h3 class="username"></h3>
 				<img class="expanded-image" src=""/>
-				<p>Some info about the user</p>
+				<p class="user_description"></p>
+				<p>website:<a class="user_url"></a></p>
+				<p class="user_location"></p>
+				
 				<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">OK</a>
 			</div>
 		</div>
 		<!-- End User info popup -->
-		
 	
 	</body>
 </html>
