@@ -199,12 +199,9 @@ function populateUserDialog(e) {
 	dialog.find(".expanded-image").attr('src', user.profile_image_url);
 	dialog.find(".user_description").text(user.description);
 
-	//check if the user_url is already appended, if not append it.
-	if(!$(".user_url")[0]){
-		console.log(user.url);
-		$('<p class="user_url">website: <a href="' + user.url + '">' + user.url +'</a></p>')
+	dialog.find('.user_url').remove();
+	$('<p class="user_url">website: <a href="' + user.url + '">' + user.url +'</a></p>')
 		.insertAfter(dialog.find(".user_description"));
-	}
 
 	dialog.find(".user_location").text(user.location);
 }
