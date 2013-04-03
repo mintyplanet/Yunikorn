@@ -86,8 +86,8 @@ li.white_divider {
 	top: -1px;
 }
 
-.username {
-	color: red;
+.username, .tweet_text a:link {
+	color: #5384C9;
 }
 
 .tweet_text {
@@ -100,6 +100,11 @@ li.white_divider {
 	overflow: auto; 
 	white-space: normal;
 	font-family: Helvetica, Arial, sans-serif;
+}
+
+li.endOfTweet {
+	font-size: 0.8em;
+	text-align: center;
 }
 
 .media{
