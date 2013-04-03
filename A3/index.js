@@ -73,16 +73,18 @@ function populateTweetDialog(e) {
 		$('<p class="tweet-full-text">' + text + '</p>').insertAfter(dialog.find(".expanded-image"));
 	}
 
-	if (typeof media != 'undefined' && !$(".media")[0]){
+	if (typeof media != 'undefined'){ // && !$(".media")[0]
 		console.log(media);
 		media.forEach(function(mediaJSON){
 			imageAnchor = dialog.find(".media-details").clone();
-			imageAnchor.click(mediaJSON, openPicDialog);
+			imageAnchor.click(mediaJSON, openPicDialog); 
 			image = imageAnchor.find(".media-template");
-			image.removeAttr('style').removeClass("media-template").addClass("media")
+			image.removeAttr('style').removeClass("media-template").addClass("media");
 			image.attr('src', mediaJSON.media_url);
 			image.appendTo(dialog.find(".media-grid"));
 		});
+	} else {
+		image.attr('src', "");	
 	}
 }
 
