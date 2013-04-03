@@ -30,6 +30,7 @@ function displayContent(){
 	for(var i = offset; i < offset + DisplayNum; i++){
 		tweet = favs[i];
 		
+		//check if there is anymore tweets, if not break loop and set moreData to false.	
 		if (typeof tweet == 'undefined'){
 			moreData = false;
 			message = '<li class="endOfTweet"> No More Tweets</li>';
@@ -58,53 +59,7 @@ function displayContent(){
 	}
 }
 
-function populateTweetDialog(e) {
-	var dialog = $("div#tweetDialog"),
-		tweet = e.data,
-		user = tweet.user,
-		media = tweet.entities.media,
-		text;
-	
-	text = replaceEntities(tweet);
-	dialog.find(".date").text(tweet.created_at);
-	dialog.find(".retweet-count").text(tweet.retweet_count);
-	dialog.find(".expanded-image").attr('src', user.profile_image_url);
 
-	if (!$(".tweet-full-text")[0]){
-		$('<p class="tweet-full-text">' + text + '</p>').insertAfter(dialog.find(".expanded-image"));
-	}
-	dialog.find('.media-details').remove();
-	if (typeof media != 'undefined'){
-		media.forEach(function(mediaJSON){
-			imageAnchor = dialog.find(".media-template").clone();
-			imageAnchor.removeAttr('style').removeClass("media-template").addClass("media-details");
-			imageAnchor.click(mediaJSON, openPicDialog); 
-			image = imageAnchor.find(".media");
-			image.attr('src', mediaJSON.media_url).appendTo(imageAnchor);
-			imageAnchor.appendTo(dialog.find(".media-grid"));
-		});
-	}
-}
-
-function populateUserDialog(e) {
-	var dialog = $("div#userDialog"),
-		user = e.data;
-	dialog.find(".username").text(user.name);
-	dialog.find(".expanded-image").attr('src', user.profile_image_url);
-	dialog.find(".user_description").text(user.description);
-	if(!$(".user_url")[0]){
-		console.log(user.url);
-		$('<p class="user_url">website: <a href="' + user.url + '">' + user.url +'</a></p>')
-		.insertAfter(dialog.find(".user_description"));
-	}
-	dialog.find(".user_location").text(user.location);
-}
-
-function openPicDialog(e) {
-	var dialog = $("div#mediaDialog"),
-		image = e.data,
-		picture = dialog.find(".large-pic").attr('src', image.media_url);
-}
 
 /*
  * return text string with all links entities replaced. 
@@ -124,7 +79,7 @@ function replaceEntities(tweet){
  */
 function replaceLinks(text,entity){
 	var urlstr;
-
+	//check if there are any url, if there are then turn them into hyperlinks
 	if(typeof entity != 'undefined'){
 		for(var i = 0; i < entity.length; i++){
 			urlstr = entity[i].url;
@@ -181,7 +136,6 @@ function removeContent(){
  *-----------------------------------------------------------------------------------------------------------	
  */
 
- 
  //called when the DOM is first loaded.
  $(document).ready(function(){
 	displayContent();
@@ -197,3 +151,69 @@ function removeContent(){
 	});
 
 });
+
+/*
+ * handle the event that a tweet is clicked
+ */
+function populateTweetDialog(e) {
+	var dialog = $("div#tweetDialog"),
+		tweet = e.data,
+		user = tweet.user,
+		media = tweet.entities.media,
+		text;
+	
+	// manipulate it's content
+	text = replaceEntities(tweet);
+	dialog.find(".date").text(tweet.created_at);
+	dialog.find(".retweet-count").text(tweet.retweet_count);
+	dialog.find(".expanded-image").attr('src', user.profile_image_url);
+
+	// check if the text of a tweet is already appended, if not append it.
+	if (!$(".tweet-full-text")[0]){
+		$('<p class="tweet-full-text">' + text + '</p>').insertAfter(dialog.find(".expanded-image"));
+	}
+
+	// append image thumbnails
+	dialog.find('.media-details').remove();
+	if (typeof media != 'undefined'){
+		media.forEach(function(mediaJSON){
+			imageAnchor = dialog.find(".media-template").clone();
+			imageAnchor.removeAttr('style').removeClass("media-template").addClass("media-details");
+			imageAnchor.click(mediaJSON, openPicDialog); 
+			image = imageAnchor.find(".media");
+			image.attr('src', mediaJSON.media_url).appendTo(imageAnchor);
+			imageAnchor.appendTo(dialog.find(".media-grid"));
+		});
+	}
+}
+
+/*
+ * handle the click event on a user profile
+ */
+function populateUserDialog(e) {
+	var dialog = $("div#userDialog"),
+		user = e.data;
+
+	//manipulate its contents
+	dialog.find(".username").text(user.name);
+	dialog.find(".expanded-image").attr('src', user.profile_image_url);
+	dialog.find(".user_description").text(user.description);
+
+	//check if the user_url is already appended, if not append it.
+	if(!$(".user_url")[0]){
+		console.log(user.url);
+		$('<p class="user_url">website: <a href="' + user.url + '">' + user.url +'</a></p>')
+		.insertAfter(dialog.find(".user_description"));
+	}
+
+	dialog.find(".user_location").text(user.location);
+}
+
+/*
+ * handle the click event on a picture
+ */
+function openPicDialog(e) {
+	var dialog = $("div#mediaDialog"),
+		image = e.data,
+		picture = dialog.find(".large-pic").attr('src', image.media_url);
+}
