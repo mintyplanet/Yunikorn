@@ -1,7 +1,7 @@
 // DisplayNum is the number of tweet to display per page.
 // offset is the tweets that are being shown. If offset = 0, then 0-9 are being shown, 10 then 10-19... etc.
 // user dictionary maps userid to the user information.
-var DisplayNum = 2,
+var DisplayNum = 10,
 	offset = 0,
 	userDict = {},
 	moreData = true,
