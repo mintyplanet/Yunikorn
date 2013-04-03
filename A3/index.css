@@ -97,7 +97,7 @@ li.white_divider {
 	text-shadow: none;
 	width: 70%;
 	height: 40px;
-	overflow: auto; 
+	overflow: hidden; 
 	white-space: normal;
 	font-family: Helvetica, Arial, sans-serif;
 }
