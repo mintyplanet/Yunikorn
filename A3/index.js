@@ -73,19 +73,16 @@ function populateTweetDialog(e) {
 	if (!$(".tweet-full-text")[0]){
 		$('<p class="tweet-full-text">' + text + '</p>').insertAfter(dialog.find(".expanded-image"));
 	}
-
-	if (typeof media != 'undefined'){ // && !$(".media")[0]
+	dialog.find('.media-details').remove();
+	if (typeof media != 'undefined'){
 		media.forEach(function(mediaJSON){
-			imageAnchor = dialog.find(".media-details").clone();
+			imageAnchor = dialog.find(".media-template").clone();
+			imageAnchor.removeAttr('style').removeClass("media-template").addClass("media-details");
 			imageAnchor.click(mediaJSON, openPicDialog); 
-			image = imageAnchor.find(".media-template");
-			image.removeAttr('style').removeClass("media-template").addClass("media");
-			image.attr('src', mediaJSON.media_url);
-			image.appendTo(imageAnchor);
+			image = imageAnchor.find(".media");
+			image.attr('src', mediaJSON.media_url).appendTo(imageAnchor);
 			imageAnchor.appendTo(dialog.find(".media-grid"));
 		});
-	} else {
-		image.attr('src', "");	
 	}
 }
 
@@ -108,8 +105,6 @@ function openPicDialog(e) {
 		image = e.data
 		size = image.sizes,
 		picture = dialog.find(".large-pic").attr('src', image.media_url);
-	
-		picture.css({"width": '90%', "height": '90%'});
 }
 
 /*
