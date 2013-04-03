@@ -75,14 +75,14 @@ function populateTweetDialog(e) {
 	}
 
 	if (typeof media != 'undefined'){ // && !$(".media")[0]
-		console.log(media);
 		media.forEach(function(mediaJSON){
 			imageAnchor = dialog.find(".media-details").clone();
 			imageAnchor.click(mediaJSON, openPicDialog); 
 			image = imageAnchor.find(".media-template");
 			image.removeAttr('style').removeClass("media-template").addClass("media");
 			image.attr('src', mediaJSON.media_url);
-			image.appendTo(dialog.find(".media-grid"));
+			image.appendTo(imageAnchor);
+			imageAnchor.appendTo(dialog.find(".media-grid"));
 		});
 	} else {
 		image.attr('src', "");	
@@ -92,22 +92,29 @@ function populateTweetDialog(e) {
 function populateUserDialog(e) {
 	var dialog = $("div#userDialog"),
 		user = e.data;
-	console.log(user);
 	dialog.find(".username").text(user.name);
 	dialog.find(".expanded-image").attr('src', user.profile_image_url);
 	dialog.find(".user_description").text(user.description);
-	dialog.find(".user_url").attr('src', user.url).text(user.url); // Link isn't activated. WHY??
+	if(!$(".user_url")[0]){
+		console.log(user.url);
+		$('<p class="user_url">website: <a href="' + user.url + '">' + user.url +'</a></p>')
+		.insertAfter(dialog.find(".user_description"));
+	}
 	dialog.find(".user_location").text(user.location);
-	
-	
 }
 
 function openPicDialog(e) {
 	var dialog = $("div#mediaDialog"),
-		image = e.data;
-	dialog.find(".large-pic").attr('src', image.media_url);
+		image = e.data
+		size = image.sizes,
+		picture = dialog.find(".large-pic").attr('src', image.media_url);
+	
+		picture.css({"width": '90%', "height": '90%'});
 }
 
+/*
+ * return text string with all links entities replaced. 
+ */
 function replaceEntities(tweet){
 	var urls = tweet.entities.urls,
 		media = tweet.entities.media,
@@ -118,6 +125,9 @@ function replaceEntities(tweet){
 	return text;
 }
 
+/*
+ * return a text string with the links in entity removed.
+ */
 function replaceLinks(text,entity){
 	var urlstr;
 
